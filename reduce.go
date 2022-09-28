@@ -1,36 +1,18 @@
 package main
 
+//Reduce
 /**
 Nella fase di Reduce, avviene il calcolo dei nuovi centroidi: ciascun reducer in parallelo riceve in input
 tutti i punti assegnati ad un determinato cluster e calcola il valore del centroide di quel cluster.
 */
-
-func reduce(clusteredPoint []ClusteredPoint, numCluster int, distanceFunction DistanceFunction, threshold int) ([]ClusteredPoint, error) {
+func reduce(clusteredPoint []ClusteredPoint, numCluster int) ([]Point, error) {
 
 	centroid := newCentroid(clusteredPoint, numCluster)
-	for i := range centroid {
-		print(centroid[i], " centroid \n")
-		/*for j := range centroid[i] {
-			print(centroid[i][j], "\n")
-		}*/
-	}
-	clusteredData, err := kmeansReduce(clusteredPoint, centroid, distanceFunction, threshold)
 
-	return clusteredData, err
+	return centroid, nil
 }
 
-func kmeansReduce(data []ClusteredPoint, centroid []Point, distanceFunction DistanceFunction, threshold int) ([]ClusteredPoint, error) {
-	var changes int
-	for ii, p := range data {
-		if closestCluster, _ := near(p, centroid, distanceFunction); closestCluster != p.ClusterNumber {
-			changes++
-			data[ii].ClusterNumber = closestCluster
-		}
-	}
-
-	return data, nil
-}
-
+// newCentroid Determina i nuovi centroidi in base all'insieme dei punti del cluster
 func newCentroid(clusteredPoint []ClusteredPoint, numCluster int) []Point {
 
 	s := make([][]Point, numCluster)
@@ -38,6 +20,9 @@ func newCentroid(clusteredPoint []ClusteredPoint, numCluster int) []Point {
 
 	var lenPoint int
 	for i := 0; i < numCluster; i++ {
+		//Per ogni punto dell'insieme verifica se il valore del centroide assegnato precedentemente
+		// corrisponde al valore del centroide, in modo tale da creare il cluster con l'insieme dei punti
+		// che appartengono ad esso
 		for ii := range clusteredPoint {
 			if (clusteredPoint[ii].ClusterNumber) == i {
 				s[i] = append(s[i], clusteredPoint[ii].Point)
@@ -47,6 +32,8 @@ func newCentroid(clusteredPoint []ClusteredPoint, numCluster int) []Point {
 
 	}
 
+	//Calcola la media dei punti all'interno di un cluster per
+	// determinare i nuovi centroidi
 	for _, i := range s {
 		p := make([][]float64, lenPoint)
 

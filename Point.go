@@ -1,33 +1,48 @@
 package main
 
-// Observations is a slice of observations
+import "gonum.org/v1/plot/plotter"
 
 //Point - Slice of Float64 Values
 type Point []float64
 
-// Add Summation of two vectors
+//Len dimensione del punto
+func (observation Point) Len() int {
+	return len(observation)
+}
+
+//XY Assegna ad x e y i valori del punto
+func (observation Point) XY(numPoint int) plotter.XYs {
+	pts := make(plotter.XYs, numPoint)
+
+	for i := 0; i < numPoint; i++ {
+		pts[i].X = observation[0]
+		pts[i].Y = observation[1]
+	}
+	return pts
+}
+
+// Add Somma di due vettori
 func (observation Point) Add(otherObservation Point) {
 	for ii, jj := range otherObservation {
 		observation[ii] += jj
 	}
 }
 
-// Mul Multiplication of a vector with a scalar
+// Mul Moltiplicazione di un vettore con uno scalare
 func (observation Point) Mul(scalar float64) {
 	for ii := range observation {
 		observation[ii] *= scalar
 	}
 }
 
-// InnerProduct Dot Product of Two vectors
+// InnerProduct Dot Prodotto tra due vettori
 func (observation Point) InnerProduct(otherObservation Point) {
 	for ii := range observation {
 		observation[ii] *= otherObservation[ii]
 	}
 }
 
-// OuterProduct Outer Product of two arrays
-// TODO: Need to be tested
+// OuterProduct Outer Prodotto tra due array
 func (observation Point) OuterProduct(otherObservation Point) [][]float64 {
 	result := make([][]float64, len(observation))
 	for ii := range result {
