@@ -89,7 +89,7 @@ func scatter(clusteredPoint []ClusteredPoint, centroids []Point, numPoint int, n
 		p.Add(s)
 	}
 
-	err = p.Save(800, 500, "scatterPlot/"+nameFile+".png")
+	err = p.Save(800, 500, "plots/"+nameFile+".png")
 	if err != nil {
 		log.Panic(err)
 	}
