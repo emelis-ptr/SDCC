@@ -5,15 +5,15 @@ package main
 Nella fase di Reduce, avviene il calcolo dei nuovi centroidi: ciascun reducer in parallelo riceve in input
 tutti i punti assegnati ad un determinato cluster e calcola il valore del centroide di quel cluster.
 */
-func reduce(clusteredPoint []ClusteredPoint, numCluster int) ([]Point, error) {
+func (a *API) Reduce(numCluster int, clusteredPoint *[]ClusteredPoint) error {
 
-	centroid := newCentroid(clusteredPoint, numCluster)
+	_ = NewCentroid(*clusteredPoint, numCluster)
 
-	return centroid, nil
+	return nil
 }
 
-// newCentroid Determina i nuovi centroidi in base all'insieme dei punti del cluster
-func newCentroid(clusteredPoint []ClusteredPoint, numCluster int) []Point {
+// NewCentroid Determina i nuovi centroidi in base all'insieme dei punti del cluster
+func NewCentroid(clusteredPoint []ClusteredPoint, numCluster int) []Point {
 
 	s := make([][]Point, numCluster)
 	centroid := make([]Point, 0)

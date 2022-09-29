@@ -2,8 +2,8 @@ package main
 
 import "math/rand"
 
-//initCentroid Si utilizza k-means++ per determinare i centroidi iniziali
-func initCentroid(data []ClusteredPoint, numCentroid int, distanceFunction DistanceMethod) []Point {
+//InitCentroid Si utilizza k-means++ per determinare i centroidi iniziali
+func InitCentroid(data []ClusteredPoint, numCentroid int, distanceFunction DistanceMethod) []Point {
 	centroid := make([]Point, numCentroid)
 
 	//Si sceglie casualmente il primo centroide
@@ -16,7 +16,7 @@ func initCentroid(data []ClusteredPoint, numCentroid int, distanceFunction Dista
 		/* Per ogni punto trova il centroide più vicino, e salva la sua distanza in un array, ottendo la
 		somma di tutte le distanze */
 		for jj, p := range data {
-			_, minDistance := near(p, centroid[:ii], distanceFunction)
+			_, minDistance := Near(p, centroid[:ii], distanceFunction)
 			distance[jj] = minDistance
 			sum += distance[jj]
 		}
@@ -33,8 +33,8 @@ func initCentroid(data []ClusteredPoint, numCentroid int, distanceFunction Dista
 	return centroid
 }
 
-// generatePoint Genera un insieme di punti con una dimensione data
-func generatePoint(numPoint int, numVector int) [][]float64 {
+// GeneratePoint Genera un insieme di punti con una dimensione data
+func GeneratePoint(numPoint int, numVector int) [][]float64 {
 	data := make([][]float64, numPoint)
 	for i := 0; i < numPoint; i++ {
 		for j := 0; j < numVector; j++ {
@@ -44,8 +44,7 @@ func generatePoint(numPoint int, numVector int) [][]float64 {
 	return data
 }
 
-// createClusteredPoint
-func createClusteredPoint(rawData [][]float64) []ClusteredPoint {
+func CreateClusteredPoint(rawData [][]float64) []ClusteredPoint {
 	data := make([]ClusteredPoint, len(rawData))
 	for ii, jj := range rawData {
 		data[ii].Point = jj

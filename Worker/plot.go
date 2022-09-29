@@ -9,8 +9,8 @@ import (
 	"log"
 )
 
-//scatter Crea dei plot su uno spazio con i punti e centroidi
-func scatter(clusteredPoint []ClusteredPoint, centroids []Point, numPoint int, nameFile string) {
+//Scatter Crea dei plot su uno spazio con i punti e centroidi
+func Scatter(clusteredPoint []ClusteredPoint, centroids []Point, numPoint int, nameFile string) {
 	p := plot.New()
 	p.Title.Text = "Points Example"
 	p.X.Label.Text = "X"
@@ -89,7 +89,7 @@ func scatter(clusteredPoint []ClusteredPoint, centroids []Point, numPoint int, n
 		p.Add(s)
 	}
 
-	err = p.Save(800, 500, "plots/"+nameFile+".png")
+	err = p.Save(800, 500, "Plot/"+nameFile+".png")
 	if err != nil {
 		log.Panic(err)
 	}
