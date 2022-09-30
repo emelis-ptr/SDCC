@@ -1,11 +1,17 @@
 package main
 
-/*func main() {
+import (
+	"log"
+	"strconv"
+)
+
+func main() {
 
 	numPoint := 100
-	numCentroid := 10
+	numCentroid := 5
 	numVector := 2
-	numInterazioni := 10
+	numInterazioni := 5
+	print(numInterazioni)
 
 	if (numCentroid == 1) || (numPoint <= 0) || (numCentroid > numPoint) {
 		return
@@ -13,24 +19,23 @@ package main
 
 	data := GeneratePoint(numPoint, numVector)
 	clusteredPoint := CreateClusteredPoint(data)
-
 	centroid := InitCentroid(clusteredPoint, numCentroid, EuclideanDistance)
 
-	var nameFile = "init"
-	Scatter(clusteredPoint, centroid, len(clusteredPoint), nameFile)
+	var firstNameFile = "kmeans-" + strconv.Itoa(numPoint) + "-" + strconv.Itoa(numCentroid)
+	ScatterInit(clusteredPoint, centroid, firstNameFile)
 
 	for i := 0; i < numInterazioni; i++ {
-		// Best Distance for Iris is Canberra Distance
 
-		clusteredPoints, err := Mapper(clusteredPoint, centroid, EuclideanDistance)
+		clusters, err := Mapper(centroid, &clusteredPoint)
+		centroid, err = Reduce(&clusters)
 
-		centroid, err = Reduce(clusteredPoints, numCentroid)
-
-		var nameFile = "init" + strconv.Itoa(i)
-		Scatter(clusteredPoint, centroid, len(clusteredPoint), nameFile)
+		var nameFile = firstNameFile + "-" + strconv.Itoa(i)
+		Scatter(clusters, nameFile)
 
 		if err != nil {
 			log.Fatal(err)
 		}
+
 	}
-}*/
+
+}

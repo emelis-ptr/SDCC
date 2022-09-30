@@ -5,45 +5,29 @@ package main
 Nella fase di Reduce, avviene il calcolo dei nuovi centroidi: ciascun reducer in parallelo riceve in input
 tutti i punti assegnati ad un determinato cluster e calcola il valore del centroide di quel cluster.
 */
-func (a *API) Reduce(numCluster int, clusteredPoint *[]ClusteredPoint) error {
+func Reduce(clusteredPoint *[]Cluster) ([]Centroid, error) {
+	cp := NewCentroid(*clusteredPoint)
 
-	_ = NewCentroid(*clusteredPoint, numCluster)
-
-	return nil
+	return cp, nil
 }
 
 // NewCentroid Determina i nuovi centroidi in base all'insieme dei punti del cluster
-func NewCentroid(clusteredPoint []ClusteredPoint, numCluster int) []Point {
-
-	s := make([][]Point, numCluster)
-	centroid := make([]Point, 0)
-
+func NewCentroid(clusters []Cluster) []Centroid {
+	centroid := make([]Centroid, len(clusters))
 	var lenPoint int
-	for i := 0; i < numCluster; i++ {
-		//Per ogni punto dell'insieme verifica se il valore del centroide assegnato precedentemente
-		// corrisponde al valore del centroide, in modo tale da creare il cluster con l'insieme dei punti
-		// che appartengono ad esso
-		for ii := range clusteredPoint {
-			if (clusteredPoint[ii].ClusterNumber) == i {
-				s[i] = append(s[i], clusteredPoint[ii].Point)
-			}
-			lenPoint = len(clusteredPoint[ii].Point)
-		}
 
-	}
+	for ii := range clusters {
+		lenPoint = len(clusters[ii].PointsData[0].Point)
 
-	//Calcola la media dei punti all'interno di un cluster per
-	// determinare i nuovi centroidi
-	for _, i := range s {
 		p := make([][]float64, lenPoint)
 
-		for _, j := range i {
-			for k := range j {
-				p[k] = append(p[k], j[k])
+		for j := range clusters[ii].PointsData {
+			for k := range clusters[ii].PointsData[j].Point {
+				p[k] = append(p[k], clusters[ii].PointsData[j].Point[k])
 			}
 		}
 
-		var mean []float64
+		var mean Point
 		for k := range p {
 			var sum float64
 			for j := range p[k] {
@@ -52,8 +36,9 @@ func NewCentroid(clusteredPoint []ClusteredPoint, numCluster int) []Point {
 			var op = sum / float64(len(p[k]))
 			mean = append(mean, op)
 		}
-		centroid = append(centroid, mean)
-	}
 
+		centroid[ii].Index = ii
+		centroid[ii].Centroid = mean
+	}
 	return centroid
 }

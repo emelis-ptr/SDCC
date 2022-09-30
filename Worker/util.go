@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
 	"io"
 	"io/ioutil"
 	"log"
@@ -60,6 +61,13 @@ func (c *Conf) readConf() {
 	err = json.Unmarshal(byteValue, c)
 	if err != nil {
 		log.Fatalln("Configuration file cannot be decoded: ", err)
+	}
+}
+
+func init() {
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
 }
 

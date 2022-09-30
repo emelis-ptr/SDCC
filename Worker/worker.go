@@ -13,13 +13,8 @@ import (
 type API int
 
 type Data struct {
-	clusteredPoint []ClusteredPoint
+	clusteredPoint []Points
 	point          []Point
-}
-
-func main() {
-	var c Conf
-	Worker(c)
 }
 
 func Worker(c Conf) {
