@@ -1,6 +1,8 @@
 package main
 
-import "gonum.org/v1/plot/plotter"
+import (
+	"gonum.org/v1/plot/plotter"
+)
 
 //Point - Slice of Float64 Values
 type Point []float64
@@ -17,6 +19,17 @@ func (observation Point) XY(numPoint int) plotter.XYs {
 	for i := 0; i < numPoint; i++ {
 		pts[i].X = observation[0]
 		pts[i].Y = observation[1]
+	}
+	return pts
+}
+
+//XY Assegna ad x e y i valori del punto
+func XYFloat(x int, y float64, observation int) plotter.XYs {
+	pts := make(plotter.XYs, observation)
+
+	for i := 0; i < observation; i++ {
+		pts[i].X = float64(x)
+		pts[i].Y = y
 	}
 	return pts
 }

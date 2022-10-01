@@ -5,20 +5,41 @@ import (
 	"math"
 )
 
+// Points Point con il numero cluster di appartenza
+type Points struct {
+	ClusterNumber int
+	Point         Point
+}
+
+type Cluster struct {
+	Centroid   Centroid
+	PointsData []Points
+	Changes    int
+}
+
+type Centroid struct {
+	Index    int
+	Centroid Point
+}
+
+type DistanceMethod func(firstVector, secondVector []float64) (float64, error)
+
 // Mapper
 /*Nella fase di Map, avviene la classificazione dei punti: ciascun Mapper in parallelo riceve in input un
 sottoinsieme (o chunk) di punti dell’insieme di partenza e per ciascuno di questi punti calcola la distanza
 euclidea tra il punto ed i k centroidi, identificando così il centroide che minimizza la distanza
 e al cui cluster il punto viene assegnato.
 */
-func Mapper(centroid []Centroid, clusteredPoint *[]Points) ([]Cluster, error) {
+func Mapper(points *Points, centroid []Centroid, cluster *[]Cluster) ([]Cluster, Points, error) {
 
-	cp, err := Kmeans(*clusteredPoint, centroid, EuclideanDistance)
+	cp, p, err := Kmeans(*points, centroid, EuclideanDistance, *cluster)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return cp, nil
+	*cluster = cp
+	*points = p
+	return cp, p, nil
 }
 
 // Near Trova il punto più vicino tra punto e centroide e
@@ -37,19 +58,22 @@ func Near(point Points, centroids []Centroid, distanceFunction DistanceMethod) (
 }
 
 // Kmeans Algorithm Per ogni punto dell'insieme identifica il cluster più vicino
-func Kmeans(points []Points, centroids []Centroid, distanceFunction DistanceMethod) ([]Cluster, error) {
-	cluster := make([]Cluster, len(centroids))
+func Kmeans(points Points, centroids []Centroid, distanceFunction DistanceMethod, cluster []Cluster) ([]Cluster, Points, error) {
 
-	for ii, jj := range points {
-		closestCluster, _ := Near(jj, centroids, distanceFunction)
-		for i := range centroids {
-			if i == closestCluster {
-				cluster[i].Centroid.Index = closestCluster
-				cluster[i].Centroid.Centroid = centroids[closestCluster].Centroid
-				cluster[i].PointsData = append(cluster[i].PointsData, points[ii])
-			}
+	closestCluster, _ := Near(points, centroids, distanceFunction)
+
+	for i := range centroids {
+		if closestCluster != points.ClusterNumber {
+			cluster[i].Changes++
+		}
+
+		if i == closestCluster {
+			points.ClusterNumber = closestCluster
+			cluster[i].Centroid.Index = closestCluster
+			cluster[i].Centroid.Centroid = centroids[closestCluster].Centroid
+			cluster[i].PointsData = append(cluster[i].PointsData, points)
 		}
 	}
 
-	return cluster, nil
+	return cluster, points, nil
 }

@@ -1,40 +1,39 @@
 package main
 
 import (
-	"log"
+	"os"
 	"strconv"
 )
 
 func main() {
 
-	numPoint := 100
-	numCentroid := 5
-	numVector := 2
-	numInterazioni := 5
-	print(numInterazioni)
+	numPoint, _ := strconv.Atoi(os.Getenv("NUMPOINT"))
+	numCentroid, _ := strconv.Atoi(os.Getenv("NUMCENTROID"))
+	numVector, _ := strconv.Atoi(os.Getenv("NUMVECTOR"))
+	maxInteration, _ := strconv.Atoi(os.Getenv("MAXINTERAZIONI"))
 
 	if (numCentroid == 1) || (numPoint <= 0) || (numCentroid > numPoint) {
 		return
 	}
 
 	data := GeneratePoint(numPoint, numVector)
-	clusteredPoint := CreateClusteredPoint(data)
-	centroid := InitCentroid(clusteredPoint, numCentroid, EuclideanDistance)
+	points := CreateClusteredPoint(data)
+	centroids := InitCentroid(points, numCentroid, EuclideanDistance)
 
 	var firstNameFile = "kmeans-" + strconv.Itoa(numPoint) + "-" + strconv.Itoa(numCentroid)
-	ScatterInit(clusteredPoint, centroid, firstNameFile)
+	ScatterInit(points, centroids, firstNameFile)
 
-	for i := 0; i < numInterazioni; i++ {
+	for i := 0; i < maxInteration; i++ {
+		cluster := make([]Cluster, numCentroid)
 
-		clusters, err := Mapper(centroid, &clusteredPoint)
-		centroid, err = Reduce(&clusters)
+		for j := range points {
+			cluster, points[j], _ = Mapper(&points[j], centroids, &cluster)
+		}
+
+		centroids, _ = Reduce(cluster, &centroids)
 
 		var nameFile = firstNameFile + "-" + strconv.Itoa(i)
-		Scatter(clusters, nameFile)
-
-		if err != nil {
-			log.Fatal(err)
-		}
+		Scatter(cluster, nameFile)
 
 	}
 

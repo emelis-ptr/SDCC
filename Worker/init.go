@@ -1,6 +1,8 @@
 package main
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 //InitCentroid Si utilizza k-means++ per determinare i centroidi iniziali
 func InitCentroid(data []Points, numCentroid int, distanceFunction DistanceMethod) []Centroid {
@@ -14,15 +16,18 @@ func InitCentroid(data []Points, numCentroid int, distanceFunction DistanceMetho
 
 	distance := make([]float64, len(data))
 
+	wcss := make([]float64, 0)
+
 	for ii := 1; ii < numCentroid; ii++ {
 		var sum float64
 		/* Per ogni punto trova il centroide più vicino, e salva la sua distanza in un array, ottendo la
 		somma di tutte le distanze */
 		for jj, p := range data {
 			_, minDistance := Near(p, centroids[:ii], distanceFunction)
-			distance[jj] = minDistance
+			distance[jj] = minDistance * minDistance
 			sum += distance[jj]
 		}
+		wcss = append(wcss, sum)
 		//Trova una distanza casuale moltiplicando un valore random con la somma delle distanze
 		randomDistance := rand.Float64() * sum
 		jj := 0
@@ -32,11 +37,13 @@ func InitCentroid(data []Points, numCentroid int, distanceFunction DistanceMetho
 			jj++
 		}
 
-		centroidPoint[ii] = data[jj].Point
+		centroidPoint[ii] = data[rand.Intn(len(data))].Point
 
 		centroids[ii].Index = ii
-		centroids[ii].Centroid = centroidPoint[ii]
+		centroids[ii].Centroid = data[rand.Intn(len(data))].Point
 	}
+
+	lineChart(wcss)
 	return centroids
 }
 
