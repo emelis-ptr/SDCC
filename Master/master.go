@@ -113,7 +113,7 @@ func EuclideanDistance(firstVector, secondVector []float64) (float64, error) {
 }
 
 // Invia un insieme di punti al worker
-func assignMap(points []Points, client *rpc.Client, cluster *[]Clusters, ch chan []Clusters) {
+func assignMap(points []Points, client *rpc.Client, ch chan []Clusters) {
 	var c []Clusters
 	err := client.Call("API.Mapper", points, &c)
 	if err != nil {
@@ -198,7 +198,7 @@ func main() {
 
 		//Assegnazione righe ai mapper.
 		for i := range jobMap {
-			go assignMap(jobMap[i], clients[i], &clusterWorker, c)
+			go assignMap(jobMap[i], clients[i], c)
 			clusterWorker = <-c
 			for j := range clusterWorker {
 				cluster[j].Centroid = clusterWorker[j].Centroid
