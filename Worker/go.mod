@@ -3,7 +3,6 @@ module main
 go 1.17
 
 require (
-	github.com/go-echarts/go-echarts/v2 v2.2.4
 	github.com/joho/godotenv v1.4.0
 	gonum.org/v1/plot v0.12.0
 )

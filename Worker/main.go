@@ -1,11 +1,6 @@
 package main
 
-import (
-	"os"
-	"strconv"
-)
-
-func main() {
+/*func maina() {
 
 	numPoint, _ := strconv.Atoi(os.Getenv("NUMPOINT"))
 	numCentroid, _ := strconv.Atoi(os.Getenv("NUMCENTROID"))
@@ -24,10 +19,15 @@ func main() {
 	ScatterInit(points, centroids, firstNameFile)
 
 	for i := 0; i < maxInteration; i++ {
-		cluster := make([]Cluster, numCentroid)
+		cluster := make([]Clusters, numCentroid)
+
+		for i := range centroids {
+			cluster[i].Centroids.Index = i
+			cluster[i].Centroids.Centroids = centroids[i].Centroids
+		}
 
 		for j := range points {
-			cluster, points[j], _ = Mapper(&points[j], centroids, &cluster)
+			cluster, points[j], _ = Mapper(&points[j], &cluster)
 		}
 
 		centroids, _ = Reduce(cluster, &centroids)
@@ -37,4 +37,4 @@ func main() {
 
 	}
 
-}
+}*/

@@ -11,7 +11,7 @@ import (
 )
 
 //Scatter Crea dei plot su uno spazio con i punti e centroidi
-func Scatter(clusters []Cluster, nameFile string) {
+func Scatter(clusters []Clusters, nameFile string) {
 	p := plot.New()
 	p.Title.Text = "KMeans"
 	p.X.Label.Text = "X"
@@ -38,7 +38,7 @@ func Scatter(clusters []Cluster, nameFile string) {
 }
 
 // ScatterInit Crea dei plot su uno spazio con i punti e centroidi
-func ScatterInit(clusteredPoint []Points, centroids []Centroid, nameFile string) {
+func ScatterInit(clusteredPoint []Points, centroids []Centroids, nameFile string) {
 	p := plot.New()
 	p.Title.Text = "KMeans"
 	p.X.Label.Text = "X"
@@ -64,7 +64,7 @@ func ScatterInit(clusteredPoint []Points, centroids []Centroid, nameFile string)
 func lineChart(wcss []float64) {
 	p := plot.New()
 	p.Title.Text = "WCSS"
-	p.X.Label.Text = "Cluster"
+	p.X.Label.Text = "Clusters"
 	p.Y.Label.Text = "WCSS"
 	p.Add(plotter.NewGrid())
 

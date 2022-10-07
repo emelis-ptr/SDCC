@@ -5,16 +5,14 @@ import (
 )
 
 //InitCentroid Si utilizza k-means++ per determinare i centroidi iniziali
-func InitCentroid(data []Points, numCentroid int, distanceFunction DistanceMethod) []Centroid {
-	centroids := make([]Centroid, numCentroid)
-	centroidPoint := make([]Point, numCentroid)
+func InitCentroid(points []Points, numCentroid int, distanceFunction DistanceMethod) []Centroids {
+	centroids := make([]Centroids, numCentroid)
 
 	//Si sceglie casualmente il primo centroide
-	centroidPoint[0] = data[rand.Intn(len(data))].Point
 	centroids[0].Index = 0
-	centroids[0].Centroid = centroidPoint[0]
+	centroids[0].Centroid = points[rand.Intn(len(points))].Point
 
-	distance := make([]float64, len(data))
+	distance := make([]float64, len(points))
 
 	wcss := make([]float64, 0)
 
@@ -22,7 +20,7 @@ func InitCentroid(data []Points, numCentroid int, distanceFunction DistanceMetho
 		var sum float64
 		/* Per ogni punto trova il centroide più vicino, e salva la sua distanza in un array, ottendo la
 		somma di tutte le distanze */
-		for jj, p := range data {
+		for jj, p := range points {
 			_, minDistance := Near(p, centroids[:ii], distanceFunction)
 			distance[jj] = minDistance * minDistance
 			sum += distance[jj]
@@ -37,13 +35,12 @@ func InitCentroid(data []Points, numCentroid int, distanceFunction DistanceMetho
 			jj++
 		}
 
-		centroidPoint[ii] = data[rand.Intn(len(data))].Point
-
 		centroids[ii].Index = ii
-		centroids[ii].Centroid = data[rand.Intn(len(data))].Point
+		centroids[ii].Centroid = points[rand.Intn(len(points))].Point
 	}
 
 	lineChart(wcss)
+
 	return centroids
 }
 

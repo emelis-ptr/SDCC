@@ -10,22 +10,15 @@ import (
 Nella fase di Reduce, avviene il calcolo dei nuovi centroidi: ciascun reducer in parallelo riceve in input
 tutti i punti assegnati ad un determinato cluster e calcola il valore del centroide di quel cluster.
 */
-func Reduce(clusters []Cluster, centroid *[]Centroid) ([]Centroid, error) {
-	cp := NewCentroid(clusters)
-	noChangesStop(clusters)
-
-	*centroid = cp
-	return cp, nil
-}
 
 // NewCentroid Determina i nuovi centroidi in base all'insieme dei punti del cluster
-func NewCentroid(clusters []Cluster) []Centroid {
+func NewCentroid(clusters []Clusters) []Centroids {
 	clusters, err := deleteEmptyCluster(clusters)
 	if err != nil {
 		return nil
 	}
 
-	centroid := make([]Centroid, len(clusters))
+	centroid := make([]Centroids, len(clusters))
 	var lenPoint int
 
 	for ii := range clusters {
@@ -57,7 +50,7 @@ func NewCentroid(clusters []Cluster) []Centroid {
 }
 
 // noChangeStop se per tutti i cluster non ci sono stati cambiamenti, l'algoritmo termina
-func noChangesStop(clusters []Cluster) {
+func noChangesStop(clusters []Clusters) {
 	var countChanges int
 	for i := range clusters {
 		if clusters[i].Changes == 0 {
@@ -70,7 +63,7 @@ func noChangesStop(clusters []Cluster) {
 }
 
 // deleteEmptyCluster Se esistiono cluster con un insieme di punti vuoto, viene eliminato
-func deleteEmptyCluster(clusters []Cluster) ([]Cluster, error) {
+func deleteEmptyCluster(clusters []Clusters) ([]Clusters, error) {
 	var index int
 	for ii := range clusters {
 		if len(clusters[ii].PointsData) == 0 {
