@@ -1,13 +1,8 @@
-package main
+package mapreduce
 
 import (
 	"errors"
-	"log"
 	"math"
-	"net"
-	"net/http"
-	"net/rpc"
-	"os"
 )
 
 //Points Point con il numero cluster di appartenza
@@ -123,28 +118,4 @@ func (a *API) Reduce(clusters []Clusters, centroid *[]Centroids) error {
 	*centroid = centroids
 
 	return nil
-}
-
-func main() {
-
-	var api = new(API)
-	err := rpc.Register(api)
-
-	if err != nil {
-		log.Fatal("Errore nella registrazione mapper ", err)
-	}
-
-	//Worker in attesa di ricevere chiamate rpc
-	rpc.HandleHTTP()
-
-	listener, err := net.Listen("tcp", os.Args[1])
-	if err != nil {
-		log.Fatal("Errore nella registrazione listener ", err)
-	}
-
-	log.Printf("Serving rpc sulla porta %s", os.Args[1])
-	err = http.Serve(listener, nil)
-	if err != nil {
-		log.Fatal("Errore in serving : ", err)
-	}
 }

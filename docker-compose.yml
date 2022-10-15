@@ -2,25 +2,38 @@ version: "3.9"
 
 services:
   master_s:
+    #environment:
+      #- REGISTRATION_PORT=${REGISTRATION_PORT}
+      #- LISTENING_PORT=${SEQUENCER_PORT}
+      #- PEER_PORT=${MULTICAST_PORT}
     container_name: master
     hostname: master
     build:
-      context: ./Master
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/Dockerfile_master
     env_file: .env
-    ##networks:
-      ##- mutual_exclusion_network
-    volumes:
-      - ./logs:/logs
+    networks:
+      - mapreduce
+    #ports:
+     #- ${SEQUENCER_PORT}
 
   worker_s:
-    deploy:
-      replicas: 3
+    #environment:
+      #- MEMBERS_NUM=${MEMBERS_NUM}
+      #- REGISTRATION_PORT=${REGISTRATION_PORT}
+      #- MULTICAST_PORT=${MULTICAST_PORT}
+      #- SEQUENCER_PORT=${SEQUENCER_PORT}
+      #- CONTROL_PORT=${CONTROL_PORT}
     build:
-      context: ./Worker
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/Dockerfile_worker
     env_file: .env
-    ##networks:
-      ##- mutual_exclusion_network
-    volumes:
-      - ./logs:/logs
+    #ports:
+      #- ${MULTICAST_PORT}
+      #- ${CONTROL_PORT}
+    networks:
+      - mapreduce
+
+networks:
+  mapreduce:
+    name: network1234

@@ -1,6 +1,6 @@
-package main
+package util
 
-import (
+/*import (
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -143,4 +143,4 @@ func lineChartPoints(p *plot.Plot, x int, y float64, len int) {
 	lpPoints.GlyphStyle.Radius = vg.Points(5)
 
 	p.Add(s)
-}
+}*/
