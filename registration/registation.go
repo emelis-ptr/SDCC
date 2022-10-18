@@ -15,8 +15,6 @@ import (
 	"syscall"
 )
 
-var processNumber int //number of process that will be accepted
-
 type Registry struct {
 	Peer util.Registration
 }
@@ -44,48 +42,12 @@ func (registry *Registry) RetrieveMember(bool bool, res *util.Registration) erro
 	return nil
 }
 
-/*func sendReply(args util.Peer, reply *util.Registration) {
-	processList[current] = args
-	(*reply).Index = current
-	current++
-}*/
-
-/*func (r *Registry) JoinNodes(args *util.Peer, reply *util.Registration) error {
-
-	if current >= processNumber {
-		log.Printf(" Too workers ")
-	} else if current < processNumber-1 {
-		//accept connection request
-		sendReply(*args, reply)
-		for current < processNumber {
-			//wait for all enough request before sending a reply
-			time.Sleep(time.Microsecond)
-		}
-		(*reply).Peer = processList
-	} else {
-		//accept last request and send reply
-		sendReply(*args, reply)
-		(*reply).Peer = processList
-	}
-
-	log.Println(reply.Peer)
-	return nil
-}
-
-func (r *Registry) ReturnNodes(reply *util.Registration, args *[]util.Peer) error {
-	*args = processList
-	return nil
-}*/
-
 func main() {
 	var err error
 
 	fmt.Println("Registration service is up")
 
 	util.OpenEnv()
-	processNumber, _ = strconv.Atoi(os.Getenv("NUM_WORKER"))
-	processList = make([]util.Peer, processNumber)
-	current = 0
 
 	registry := new(Registry)
 
