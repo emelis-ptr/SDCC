@@ -90,7 +90,7 @@ func EuclideanDistance(firstVector, secondVector []float64) (float64, error) {
 }
 
 // checkChanges verifica se ci sono cambiamenti all'interno del cluster
-func checkChanges(cluster []mapreduce.Clusters, changes []int, numWorker int, clients []*rpc.Client) []int {
+func checkChanges(cluster []mapreduce.Clusters, changes []int, numWorker int, clients []*rpc.Client, client *rpc.Client) []int {
 	var countChanges int
 	for j := range cluster {
 		for _, value := range changes {
@@ -100,18 +100,35 @@ func checkChanges(cluster []mapreduce.Clusters, changes []int, numWorker int, cl
 		}
 
 		if countChanges == len(cluster) {
+			checkEmptyPoint(cluster)
 			for i := 0; i < numWorker; i++ {
 				err := clients[i].Close()
+				client.Close()
 				if err != nil {
 					return nil
 				}
-				log.Printf("Fine")
 			}
+			log.Printf("Fine")
 		}
 	}
+
 	changes = nil
 	for i := range cluster {
 		changes = append(changes, cluster[i].Changes)
 	}
 	return changes
+}
+
+//verifica se ci sono cluster con un insieme di punti vuoto
+func checkEmptyPoint(cluster []mapreduce.Clusters) {
+	//Verica che non ci siano cluster vuoti, altrimenti lo elimina
+	var index []int
+	for ii := range cluster {
+		if len(cluster[ii].PointsData) == 0 {
+			index = append(index, ii)
+		}
+	}
+	for i := range index {
+		cluster = append(cluster[:i], cluster[i+1:]...)
+	}
 }

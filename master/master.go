@@ -8,6 +8,7 @@ import (
 	"net/rpc"
 	"os"
 	"strconv"
+	"time"
 )
 
 type DistanceMethod func(firstVector, secondVector []float64) (float64, error)
@@ -59,6 +60,7 @@ func splitJobReduce(clusters []mapreduce.Clusters, numWorker int) [][]mapreduce.
 }
 
 func main() {
+
 	fmt.Println("Master is up")
 	var err error
 	var num int
@@ -69,22 +71,42 @@ func main() {
 	maxInteration, _ := strconv.Atoi(os.Getenv("MAXINTERAZIONI"))
 	num, _ = strconv.Atoi(os.Getenv("NUM_WORKER"))
 
+	var registrations util.Registration
+
+	var bools bool
+	client, err := rpc.DialHTTP("tcp", conf.RegIP+":"+strconv.Itoa(conf.RegPort))
+
+	var try int
+	for err != nil && try < 5 {
+		//if the port is closed on first try, try again. Ten tries are allowed
+		client, err = rpc.DialHTTP("tcp", conf.RegIP+":"+strconv.Itoa(conf.RegPort))
+		try++
+	}
+	time.Sleep(time.Second)
+	err = client.Call("Registry.RetrieveMember", bools, &registrations)
+
+	for i := range registrations.Peer {
+		log.Printf("Port %s", strconv.Itoa(registrations.Peer[i].Port))
+		log.Printf("Address %s ", registrations.Peer[i].Address)
+	}
+
 	//creazione di punti e centroidi
 	points, centroids := createInitValue()
 
 	clients := make([]*rpc.Client, num)
-	call := make([]*rpc.Call, num)
+	calls := make([]*rpc.Call, num)
 
-	for i := 0; i < num; i++ {
-		clients[i], err = rpc.DialHTTP("tcp", conf.PeerIP+":"+strconv.Itoa(conf.PeerPort))
+	for i := 0; i < len(registrations.Peer); i++ {
+		clients[i], err = rpc.DialHTTP("tcp", registrations.Peer[i].Address+":"+strconv.Itoa(registrations.Peer[i].Port))
 		if err != nil {
 			fmt.Println("Errore di connessione , retring ... ")
 		}
 	}
 
-	fmt.Println(conf.PeerIP + " " + strconv.Itoa(conf.PeerPort))
-	fmt.Println(clients)
-
+	if len(registrations.Peer) < num {
+		time.Sleep(time.Second)
+		return
+	}
 	numWorker := len(clients)
 
 	jobMap := splitJobMap(points, numWorker)
@@ -92,6 +114,8 @@ func main() {
 
 	log.Printf("Inizio iterazione dell'algoritmo")
 	for it := 0; it < maxInteration; it++ {
+		log.Printf("Iterazione numero: %d", it)
+
 		c := make(chan []mapreduce.Clusters)
 		clusterWorker := make([]mapreduce.Clusters, len(centroids))
 		cluster := make([]mapreduce.Clusters, len(centroids))
@@ -113,20 +137,24 @@ func main() {
 			}
 		}
 
+		for ii := range cluster {
+			log.Printf("Cluster %d con %d punti", cluster[ii].Centroid.Index, len(cluster[ii].PointsData))
+		}
+
 		jobReduce := splitJobReduce(cluster, numWorker)
 		newCentroids := make([]mapreduce.Centroids, 0)
 		centroids = nil
 
 		for i := range jobReduce {
-			call[i] = clients[i].Go("API.Reduce", jobReduce[i], &newCentroids, nil)
-			call[i] = <-call[i].Done
+			calls[i] = clients[i].Go("API.Reduce", jobReduce[i], &newCentroids, nil)
+			calls[i] = <-calls[i].Done
 			for j := range newCentroids {
 				centroids = append(centroids, newCentroids[j])
 			}
 		}
 
 		//Se non si verificano cambiamenti nel cluster, l'algoritmo termina
-		changes = checkChanges(cluster, changes, numWorker, clients)
-
+		changes = checkChanges(cluster, changes, numWorker, clients, client)
 	}
+
 }

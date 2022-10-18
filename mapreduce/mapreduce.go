@@ -1,7 +1,7 @@
 package mapreduce
 
 import (
-	"errors"
+	"log"
 	"math"
 )
 
@@ -27,6 +27,9 @@ type Centroids struct {
 type API int
 
 func (a *API) Mapper(point []Points, cluster *[]Clusters) error {
+
+	log.Printf(" ** Map phase **")
+	log.Printf("Numero di punti assegnati %d", len(point))
 
 	lenCentroid := len(point[0].Centroids)
 	clusters := make([]Clusters, lenCentroid)
@@ -66,24 +69,22 @@ func (a *API) Mapper(point []Points, cluster *[]Clusters) error {
 			}
 		}
 	}
+
 	*cluster = clusters
 	return nil
 }
 
 func (a *API) Reduce(clusters []Clusters, centroid *[]Centroids) error {
 
-	//Verica che non ci siano cluster vuoti, altrimenti lo elimina
-	var index int
+	log.Printf(" ** Reduce phase **")
+	log.Printf("Numero di cluster assegnati %d", len(clusters))
+
+	if len(clusters) == 0 {
+		return nil
+	}
+
 	for ii := range clusters {
-		if len(clusters[ii].PointsData) == 0 {
-			index = ii
-
-			if index < 0 || index >= len(clusters) {
-				return errors.New("index cannot be less than 0")
-			}
-
-			clusters = append(clusters[:index], clusters[index+1:]...)
-		}
+		log.Printf("Cluster %d con %d punti", clusters[ii].Centroid.Index, len(clusters[ii].PointsData))
 	}
 
 	//Crea centroid
@@ -91,30 +92,32 @@ func (a *API) Reduce(clusters []Clusters, centroid *[]Centroids) error {
 	var lenPoint int
 
 	for ii := range clusters {
-		lenPoint = len(clusters[ii].PointsData[0].Point)
+		if len(clusters[ii].PointsData) != 0 {
 
-		p := make([][]float64, lenPoint)
+			lenPoint = len(clusters[ii].PointsData[0].Point)
 
-		for j := range clusters[ii].PointsData {
-			for k := range clusters[ii].PointsData[j].Point {
-				p[k] = append(p[k], clusters[ii].PointsData[j].Point[k])
+			p := make([][]float64, lenPoint)
+
+			for j := range clusters[ii].PointsData {
+				for k := range clusters[ii].PointsData[j].Point {
+					p[k] = append(p[k], clusters[ii].PointsData[j].Point[k])
+				}
 			}
-		}
 
-		var mean []float64
-		for k := range p {
-			var sum float64
-			for j := range p[k] {
-				sum += p[k][j]
+			var mean []float64
+			for k := range p {
+				var sum float64
+				for j := range p[k] {
+					sum += p[k][j]
+				}
+				var op = sum / float64(len(p[k]))
+				mean = append(mean, op)
 			}
-			var op = sum / float64(len(p[k]))
-			mean = append(mean, op)
-		}
 
-		centroids[ii].Index = ii
-		centroids[ii].Centroid = mean
+			centroids[ii].Index = ii
+			centroids[ii].Centroid = mean
+		}
 	}
-
 	*centroid = centroids
 
 	return nil

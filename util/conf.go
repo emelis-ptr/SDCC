@@ -17,6 +17,16 @@ type Conf struct {
 	PeerIP     string `json:"peer_ip"`
 }
 
+type Peer struct {
+	Address string
+	Port    int
+}
+
+type Registration struct {
+	Peer  []Peer
+	Index int
+}
+
 // ReadConf read config from json file
 func (c *Conf) ReadConf() {
 	jsonFile, err := os.Open("./config.json")
@@ -49,5 +59,4 @@ func GetOutboundIP() string {
 
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 	return localAddr.IP.String()
-
 }
