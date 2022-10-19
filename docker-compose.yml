@@ -30,6 +30,9 @@ services:
     env_file: .env
     networks:
       - mapreduce
+    depends_on:
+      - reg_s
+      - worker_s
     #ports:
      #- ${SEQUENCER_PORT}
 
@@ -49,6 +52,8 @@ services:
       #- ${CONTROL_PORT}
     networks:
       - mapreduce
+    depends_on:
+      - reg_s
 
 networks:
   mapreduce:

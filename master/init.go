@@ -5,8 +5,21 @@ import (
 	"main/mapreduce"
 	"math"
 	"math/rand"
-	"net/rpc"
+	"os"
+	"strconv"
 )
+
+func createInitValue() ([]mapreduce.Points, []mapreduce.Centroids) {
+	numPoint, _ := strconv.Atoi(os.Getenv("NUMPOINT"))
+	numCentroid, _ := strconv.Atoi(os.Getenv("NUMCENTROID"))
+	numVector, _ := strconv.Atoi(os.Getenv("NUMVECTOR"))
+
+	data := GeneratePoint(numPoint, numVector)
+	points := CreateClusteredPoint(data)
+	centroids := InitCentroid(points, numCentroid)
+
+	return points, centroids
+}
 
 //InitCentroid Si utilizza k-means++ per determinare i centroidi iniziali
 func InitCentroid(points []mapreduce.Points, numCentroid int) []mapreduce.Centroids {
@@ -90,7 +103,7 @@ func EuclideanDistance(firstVector, secondVector []float64) (float64, error) {
 }
 
 // checkChanges verifica se ci sono cambiamenti all'interno del cluster
-func checkChanges(cluster []mapreduce.Clusters, changes []int, numWorker int, clients []*rpc.Client, client *rpc.Client) []int {
+func checkChanges(cluster []mapreduce.Clusters, changes []int) []int {
 	var countChanges int
 	for j := range cluster {
 		for _, value := range changes {
@@ -100,15 +113,9 @@ func checkChanges(cluster []mapreduce.Clusters, changes []int, numWorker int, cl
 		}
 
 		if countChanges == len(cluster) {
-			checkEmptyPoint(cluster)
-			for i := 0; i < numWorker; i++ {
-				err := clients[i].Close()
-				client.Close()
-				if err != nil {
-					return nil
-				}
-			}
+			//checkEmptyPoint(cluster)
 			log.Printf("Fine")
+			break
 		}
 	}
 

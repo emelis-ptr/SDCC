@@ -30,8 +30,9 @@ func (registry *Registry) RegisterMember(arg util.Peer, res *util.Registration) 
 
 	//*res = waitForAll(registry, arg) // put the member in wait for others and give him the membership
 	registration.Peer = append(registration.Peer, arg)
+	registry.Peer = registration
 	*res = registration
-	registry.Peer = *res
+
 	return nil
 }
 
@@ -49,16 +50,14 @@ func main() {
 
 	util.OpenEnv()
 
-	registry := new(Registry)
-
 	//read configuration
 	var conf util.Conf
 	conf.ReadConf()
 
-	//server := rpc.NewServer()
-	err = rpc.Register(registry)
+	//expose api on open port
+	err = rpc.Register(new(Registry))
 	if err != nil {
-		log.Fatalf("Error in register server name", err)
+		log.Fatalln("Error in register server name", err)
 	}
 
 	//init variables and signal handler for shutdown
@@ -83,11 +82,6 @@ func main() {
 	log.Printf("Serving rpc sulla porta %s", strconv.Itoa(conf.RegPort))
 	log.Printf("Address reg %s", conf.RegIP)
 
-	//expose api on open port
-	err = rpc.Register(new(Registry))
-	if err != nil {
-		log.Fatal("Error registry", err)
-	}
 	rpc.HandleHTTP()
 	g, gCtx := errgroup.WithContext(ctx)
 	g.Go(func() error {

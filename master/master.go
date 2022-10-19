@@ -13,18 +13,6 @@ import (
 
 type DistanceMethod func(firstVector, secondVector []float64) (float64, error)
 
-func createInitValue() ([]mapreduce.Points, []mapreduce.Centroids) {
-	numPoint, _ := strconv.Atoi(os.Getenv("NUMPOINT"))
-	numCentroid, _ := strconv.Atoi(os.Getenv("NUMCENTROID"))
-	numVector, _ := strconv.Atoi(os.Getenv("NUMVECTOR"))
-
-	data := GeneratePoint(numPoint, numVector)
-	points := CreateClusteredPoint(data)
-	centroids := InitCentroid(points, numCentroid)
-
-	return points, centroids
-}
-
 // Invia un insieme di punti al worker
 func assignMap(points []mapreduce.Points, client *rpc.Client, ch chan []mapreduce.Clusters) {
 	var c []mapreduce.Clusters
@@ -76,14 +64,11 @@ func main() {
 	var bools bool
 	client, err := rpc.DialHTTP("tcp", conf.RegIP+":"+strconv.Itoa(conf.RegPort))
 
-	var try int
-	for err != nil && try < 5 {
-		//if the port is closed on first try, try again. Ten tries are allowed
-		client, err = rpc.DialHTTP("tcp", conf.RegIP+":"+strconv.Itoa(conf.RegPort))
-		try++
-	}
 	time.Sleep(time.Second)
 	err = client.Call("Registry.RetrieveMember", bools, &registrations)
+	for err != nil {
+		log.Fatal("Error call registry", err.Error())
+	}
 
 	for i := range registrations.Peer {
 		log.Printf("Port %s", strconv.Itoa(registrations.Peer[i].Port))
@@ -92,6 +77,9 @@ func main() {
 
 	//creazione di punti e centroidi
 	points, centroids := createInitValue()
+
+	log.Printf("Punti: %d", len(points))
+	log.Printf("Centroidi: %d", len(centroids))
 
 	clients := make([]*rpc.Client, num)
 	calls := make([]*rpc.Call, num)
@@ -103,10 +91,6 @@ func main() {
 		}
 	}
 
-	if len(registrations.Peer) < num {
-		time.Sleep(time.Second)
-		return
-	}
 	numWorker := len(clients)
 
 	jobMap := splitJobMap(points, numWorker)
@@ -154,7 +138,35 @@ func main() {
 		}
 
 		//Se non si verificano cambiamenti nel cluster, l'algoritmo termina
-		changes = checkChanges(cluster, changes, numWorker, clients, client)
+		changes = checkChanges(cluster, changes)
 	}
 
+}
+
+func writeFile(cluster []mapreduce.Clusters) {
+	// create file
+	f, err := os.Create("kmeans.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// remember to close the file
+	defer f.Close()
+
+	for _, line := range cluster {
+		_, err = f.WriteString(strconv.Itoa(line.Centroid.Index) + " - ")
+		for i := range line.Centroid.Centroid {
+			_, err = f.WriteString(strconv.FormatFloat(line.Centroid.Centroid[i], 'f', 5, 64) + " ")
+		}
+		_, err = f.WriteString("\n")
+		for i := range line.PointsData {
+			for j := range line.PointsData[i].Point {
+				_, err = f.WriteString(strconv.FormatFloat(line.PointsData[i].Point[j], 'f', 5, 64) + " ")
+			}
+			_, err = f.WriteString(" - ")
+		}
+		_, err = f.WriteString("\n")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }
