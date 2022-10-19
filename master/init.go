@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"main/mapreduce"
 	"math"
 	"math/rand"
@@ -103,19 +102,18 @@ func EuclideanDistance(firstVector, secondVector []float64) (float64, error) {
 }
 
 // checkChanges verifica se ci sono cambiamenti all'interno del cluster
-func checkChanges(cluster []mapreduce.Clusters, changes []int) []int {
+func checkChanges(cluster []mapreduce.Clusters, changes []int) ([]int, bool) {
+	isChanged := false
 	var countChanges int
 	for j := range cluster {
-		for _, value := range changes {
-			if value == cluster[j].Changes {
+		for i, value := range changes {
+			if i == j && value == cluster[j].Changes {
 				countChanges++
 			}
 		}
 
 		if countChanges == len(cluster) {
-			//checkEmptyPoint(cluster)
-			log.Printf("Fine")
-			break
+			isChanged = true
 		}
 	}
 
@@ -123,19 +121,19 @@ func checkChanges(cluster []mapreduce.Clusters, changes []int) []int {
 	for i := range cluster {
 		changes = append(changes, cluster[i].Changes)
 	}
-	return changes
+
+	return changes, isChanged
 }
 
 //verifica se ci sono cluster con un insieme di punti vuoto
 func checkEmptyPoint(cluster []mapreduce.Clusters) {
 	//Verica che non ci siano cluster vuoti, altrimenti lo elimina
 	var index []int
-	for ii := range cluster {
+	lenCluster := len(cluster)
+	for ii := 0; ii < lenCluster; ii++ {
 		if len(cluster[ii].PointsData) == 0 {
-			index = append(index, ii)
+			index = append(index, cluster[ii].Centroid.Index)
 		}
 	}
-	for i := range index {
-		cluster = append(cluster[:i], cluster[i+1:]...)
-	}
+
 }

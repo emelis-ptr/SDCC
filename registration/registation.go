@@ -39,6 +39,9 @@ func (registry *Registry) RegisterMember(arg util.Peer, res *util.Registration) 
 func (registry *Registry) RetrieveMember(bool bool, res *util.Registration) error {
 	registration = registry.Peer
 
+	if registration.Peer != nil {
+		bool = true
+	}
 	*res = registration
 	return nil
 }

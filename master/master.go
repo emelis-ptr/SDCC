@@ -95,6 +95,7 @@ func main() {
 
 	jobMap := splitJobMap(points, numWorker)
 	var changes []int
+	var isChanged bool
 
 	log.Printf("Inizio iterazione dell'algoritmo")
 	for it := 0; it < maxInteration; it++ {
@@ -112,6 +113,7 @@ func main() {
 		for i := range jobMap {
 			go assignMap(jobMap[i], clients[i], c)
 			clusterWorker = <-c
+
 			for j := range clusterWorker {
 				cluster[j].Centroid = clusterWorker[j].Centroid
 				cluster[j].Changes += clusterWorker[j].Changes
@@ -122,7 +124,9 @@ func main() {
 		}
 
 		for ii := range cluster {
-			log.Printf("Cluster %d con %d punti", cluster[ii].Centroid.Index, len(cluster[ii].PointsData))
+			if len(cluster[ii].PointsData) != 0 {
+				log.Printf("Cluster %d con %d punti", cluster[ii].Centroid.Index, len(cluster[ii].PointsData))
+			}
 		}
 
 		jobReduce := splitJobReduce(cluster, numWorker)
@@ -138,9 +142,13 @@ func main() {
 		}
 
 		//Se non si verificano cambiamenti nel cluster, l'algoritmo termina
-		changes = checkChanges(cluster, changes)
-	}
+		changes, isChanged = checkChanges(cluster, changes)
 
+		if isChanged {
+			writeFile(cluster)
+			break
+		}
+	}
 }
 
 func writeFile(cluster []mapreduce.Clusters) {
@@ -149,6 +157,7 @@ func writeFile(cluster []mapreduce.Clusters) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// remember to close the file
 	defer f.Close()
 

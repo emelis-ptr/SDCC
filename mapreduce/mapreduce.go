@@ -79,10 +79,6 @@ func (a *API) Reduce(clusters []Clusters, centroid *[]Centroids) error {
 	log.Printf(" ** Reduce phase **")
 	log.Printf("Numero di cluster assegnati %d", len(clusters))
 
-	if len(clusters) == 0 {
-		return nil
-	}
-
 	for ii := range clusters {
 		log.Printf("Cluster %d con %d punti", clusters[ii].Centroid.Index, len(clusters[ii].PointsData))
 	}
@@ -91,31 +87,33 @@ func (a *API) Reduce(clusters []Clusters, centroid *[]Centroids) error {
 	centroids := make([]Centroids, len(clusters))
 	var lenPoint int
 
-	for ii := range clusters {
-		if len(clusters[ii].PointsData) != 0 {
+	if len(clusters) != 0 {
+		for ii := range clusters {
+			if len(clusters[ii].PointsData) != 0 {
 
-			lenPoint = len(clusters[ii].PointsData[0].Point)
+				lenPoint = len(clusters[ii].PointsData[0].Point)
 
-			p := make([][]float64, lenPoint)
+				p := make([][]float64, lenPoint)
 
-			for j := range clusters[ii].PointsData {
-				for k := range clusters[ii].PointsData[j].Point {
-					p[k] = append(p[k], clusters[ii].PointsData[j].Point[k])
+				for j := range clusters[ii].PointsData {
+					for k := range clusters[ii].PointsData[j].Point {
+						p[k] = append(p[k], clusters[ii].PointsData[j].Point[k])
+					}
 				}
-			}
 
-			var mean []float64
-			for k := range p {
-				var sum float64
-				for j := range p[k] {
-					sum += p[k][j]
+				var mean []float64
+				for k := range p {
+					var sum float64
+					for j := range p[k] {
+						sum += p[k][j]
+					}
+					var op = sum / float64(len(p[k]))
+					mean = append(mean, op)
 				}
-				var op = sum / float64(len(p[k]))
-				mean = append(mean, op)
-			}
 
-			centroids[ii].Index = ii
-			centroids[ii].Centroid = mean
+				centroids[ii].Index = ii
+				centroids[ii].Centroid = mean
+			}
 		}
 	}
 	*centroid = centroids
