@@ -2,10 +2,6 @@ version: "3.9"
 
 services:
   reg_s:
-    #environment:
-    #- REGISTRATION_PORT=${REGISTRATION_PORT}
-    #- LISTENING_PORT=${SEQUENCER_PORT}
-    #- PEER_PORT=${MULTICAST_PORT}
     container_name: registry
     hostname: registry
     build:
@@ -14,14 +10,10 @@ services:
     env_file: .env
     networks:
       - mapreduce
-      #ports:
-      #- ${SEQUENCER_PORT}
+    volumes:
+      - ./doc:/doc
 
   master_s:
-    #environment:
-      #- REGISTRATION_PORT=${REGISTRATION_PORT}
-      #- LISTENING_PORT=${SEQUENCER_PORT}
-      #- PEER_PORT=${MULTICAST_PORT}
     container_name: master
     hostname: master
     build:
@@ -33,27 +25,20 @@ services:
     depends_on:
       - reg_s
       - worker_s
-    #ports:
-     #- ${SEQUENCER_PORT}
+    volumes:
+      - ./doc:/doc
 
   worker_s:
-    #environment:
-      #- MEMBERS_NUM=${MEMBERS_NUM}
-      #- REGISTRATION_PORT=${REGISTRATION_PORT}
-      #- MULTICAST_PORT=${MULTICAST_PORT}
-      #- SEQUENCER_PORT=${SEQUENCER_PORT}
-      #- CONTROL_PORT=${CONTROL_PORT}
     build:
       context: .
       dockerfile: ./docker/Dockerfile_worker
     env_file: .env
-    #ports:
-      #- ${MULTICAST_PORT}
-      #- ${CONTROL_PORT}
     networks:
       - mapreduce
     depends_on:
       - reg_s
+    volumes:
+      - ./doc:/doc
 
 networks:
   mapreduce:

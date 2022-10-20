@@ -38,12 +38,13 @@ func splitJobMap(points []mapreduce.Points, numWorker int) [][]mapreduce.Points 
 // Determina quanti cluster inviare al worker
 func splitJobReduce(clusters []mapreduce.Clusters, numWorker int) [][]mapreduce.Clusters {
 	var result [][]mapreduce.Clusters
-	for i := 0; i < numWorker; i++ {
 
+	for i := 0; i < numWorker; i++ {
 		min := i * len(clusters) / numWorker
 		max := ((i + 1) * len(clusters)) / numWorker
 		result = append(result, clusters[min:max])
 	}
+
 	return result
 }
 
@@ -56,7 +57,7 @@ func main() {
 	conf.ReadConf()
 
 	util.OpenEnv()
-	maxInteration, _ := strconv.Atoi(os.Getenv("MAXINTERAZIONI"))
+	//maxInteration, _ := strconv.Atoi(os.Getenv("MAXINTERAZIONI"))
 	num, _ = strconv.Atoi(os.Getenv("NUM_WORKER"))
 
 	var registrations util.Registration
@@ -97,9 +98,10 @@ func main() {
 	var changes []int
 	var isChanged bool
 
+	var it int
 	log.Printf("Inizio iterazione dell'algoritmo")
-	for it := 0; it < maxInteration; it++ {
-		log.Printf("Iterazione numero: %d", it)
+	for {
+		it++
 
 		c := make(chan []mapreduce.Clusters)
 		clusterWorker := make([]mapreduce.Clusters, len(centroids))
@@ -123,6 +125,13 @@ func main() {
 			}
 		}
 
+		//Se non si verificano cambiamenti nel cluster, l'algoritmo termina
+		changes, isChanged = checkChanges(cluster, changes)
+		if isChanged {
+			break
+		}
+
+		log.Printf("Iterazione numero: %d", it)
 		for ii := range cluster {
 			if len(cluster[ii].PointsData) != 0 {
 				log.Printf("Cluster %d con %d punti", cluster[ii].Centroid.Index, len(cluster[ii].PointsData))
@@ -141,41 +150,6 @@ func main() {
 			}
 		}
 
-		//Se non si verificano cambiamenti nel cluster, l'algoritmo termina
-		changes, isChanged = checkChanges(cluster, changes)
-
-		if isChanged {
-			writeFile(cluster)
-			break
-		}
-	}
-}
-
-func writeFile(cluster []mapreduce.Clusters) {
-	// create file
-	f, err := os.Create("kmeans.txt")
-	if err != nil {
-		log.Fatal(err)
 	}
 
-	// remember to close the file
-	defer f.Close()
-
-	for _, line := range cluster {
-		_, err = f.WriteString(strconv.Itoa(line.Centroid.Index) + " - ")
-		for i := range line.Centroid.Centroid {
-			_, err = f.WriteString(strconv.FormatFloat(line.Centroid.Centroid[i], 'f', 5, 64) + " ")
-		}
-		_, err = f.WriteString("\n")
-		for i := range line.PointsData {
-			for j := range line.PointsData[i].Point {
-				_, err = f.WriteString(strconv.FormatFloat(line.PointsData[i].Point[j], 'f', 5, 64) + " ")
-			}
-			_, err = f.WriteString(" - ")
-		}
-		_, err = f.WriteString("\n")
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 }

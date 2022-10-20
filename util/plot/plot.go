@@ -1,6 +1,5 @@
-package util
+package plot
 
-/*
 import (
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -8,11 +7,17 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 	"image/color"
 	"log"
+	"main/mapreduce"
 	"math/rand"
 )
 
+const (
+	nameDir = "png"
+	extFile = "png"
+)
+
 //Scatter Crea dei plot su uno spazio con i punti e centroidi
-func Scatter(clusters []Clusters, nameFile string) {
+func Scatter(clusters []mapreduce.Clusters, nameFile string) {
 	p := plot.New()
 	p.Title.Text = "KMeans"
 	p.X.Label.Text = "X"
@@ -32,14 +37,15 @@ func Scatter(clusters []Clusters, nameFile string) {
 		PlotPoints(p, clusters[i].Centroid.Centroid, len(clusters), 22, 160, 133, 1)
 	}
 
-	err = p.Save(1200, 800, "../Plot/"+nameFile+".png")
+	pathFile := "./doc/plot/" + nameDir + "/" + nameFile + "." + extFile
+	err = p.Save(1200, 800, pathFile)
 	if err != nil {
 		log.Panic(err)
 	}
 }
 
 // ScatterInit Crea dei plot su uno spazio con i punti e centroidi
-func ScatterInit(clusteredPoint []Points, centroids []Centroids, nameFile string) {
+func ScatterInit(clusteredPoint []mapreduce.Points, centroids []mapreduce.Centroids, nameFile string) {
 	p := plot.New()
 	p.Title.Text = "KMeans"
 	p.X.Label.Text = "X"
@@ -56,7 +62,7 @@ func ScatterInit(clusteredPoint []Points, centroids []Centroids, nameFile string
 		PlotPoints(p, centroids[i].Centroid, len(centroids), 22, 160, 133, 1)
 	}
 
-	err = p.Save(1200, 800, "../Plot/"+nameFile+".png")
+	err = p.Save(1200, 800, nameDir+"/"+nameFile+"."+extFile)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -72,17 +78,17 @@ func lineChart(wcss []float64) {
 	for ii := range wcss {
 		lineChartPoints(p, ii, wcss[ii], len(wcss))
 	}
-	err := p.Save(1200, 600, "../Plot/wcss.png")
+	err := p.Save(1200, 600, "png/wcss.png")
 	if err != nil {
 		return
 	}
 
 }
 
-func PlotPoints(p *plot.Plot, point Point, len int, r uint8, g uint8, b uint8, a uint8) {
-	dataPoint := point.XY(len)
-	lineData := point.XY(len)
-	linePointsData := point.XY(len)
+func PlotPoints(p *plot.Plot, point []float64, len int, r uint8, g uint8, b uint8, a uint8) {
+	dataPoint := XY(len, point)
+	lineData := XY(len, point)
+	linePointsData := XY(len, point)
 
 	s, err := plotter.NewScatter(dataPoint)
 	if err != nil {
@@ -144,4 +150,24 @@ func lineChartPoints(p *plot.Plot, x int, y float64, len int) {
 	lpPoints.GlyphStyle.Radius = vg.Points(5)
 
 	p.Add(s)
-}*/
+}
+
+func XYFloat(x int, y float64, observation int) plotter.XYs {
+	pts := make(plotter.XYs, observation)
+
+	for i := 0; i < observation; i++ {
+		pts[i].X = float64(x)
+		pts[i].Y = y
+	}
+	return pts
+}
+
+//XY Assegna ad x e y i valori del punto
+func XY(numPoint int, observation []float64) plotter.XYs {
+	pts := make(plotter.XYs, numPoint)
+	for i := 0; i < numPoint; i++ {
+		pts[i].X = observation[0]
+		pts[i].Y = observation[1]
+	}
+	return pts
+}
