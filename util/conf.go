@@ -53,7 +53,7 @@ func (c *Conf) ReadConf() {
 func GetOutboundIP() string {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Errore nella rete", err)
 	}
 	defer conn.Close()
 
