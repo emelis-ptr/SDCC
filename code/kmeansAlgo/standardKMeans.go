@@ -1,7 +1,7 @@
-package kmeans
+package kmeansAlgo
 
 import (
-	"main/mapreduce"
+	"main/code/mapreduce"
 	"math/rand"
 	"net/rpc"
 )

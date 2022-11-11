@@ -1,8 +1,8 @@
 package main
 
 import (
-	"main/mapreduce"
-	"main/util"
+	"main/code/mapreduce"
+	"main/code/util"
 	"math"
 	"math/rand"
 )

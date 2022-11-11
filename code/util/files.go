@@ -3,13 +3,13 @@ package util
 import (
 	"github.com/joho/godotenv"
 	"log"
-	"main/mapreduce"
+	"main/code/mapreduce"
 	"os"
 	"strconv"
 )
 
 const (
-	nameFile = "kmeans"
+	nameFile = "kmeansAlgo"
 )
 
 //Open file .env

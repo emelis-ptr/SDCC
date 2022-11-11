@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	kmeans2 "main/kmeans"
-	"main/util"
+	"main/code/kmeansAlgo"
+	"main/code/util"
 	"net/rpc"
 	"os"
 	"strconv"
@@ -54,16 +54,23 @@ func main() {
 		workerCrash := numWorker - numClient
 		log.Fatalf("Errore! %d worker hanno subito un crash", workerCrash)
 	}
+
 	data := GeneratePoint(numPoint)
 	points := CreateClusteredPoint(data)
 
-	fmt.Println(" ** Llyod **")
-	kmeans2.Llyod(numClient, numCentroid, points, util.Llyod, clients, calls)
+	algo := os.Getenv(util.Algo)
+	switch algo {
+	case util.Llyod:
+		fmt.Println(" ** Llyod **")
+		kmeansAlgo.Llyod(numClient, numCentroid, points, util.Llyod, clients, calls)
 
-	fmt.Println(" ** Standard KMeans **")
-	kmeans2.StandardKMeans(numClient, numCentroid, points, util.Standard, clients, calls)
+	case util.Standard:
+		fmt.Println(" ** Standard KMeans **")
+		kmeansAlgo.StandardKMeans(numClient, numCentroid, points, util.Standard, clients, calls)
 
-	fmt.Println(" ** KMeans++ **")
-	kmeans2.KMeansPlusPlus(numClient, numCentroid, points, util.KmeansPlusPlus, clients, calls)
+	case util.KmeansPlusPlus:
+		fmt.Println(" ** KMeans++ **")
+		kmeansAlgo.KMeansPlusPlus(numClient, numCentroid, points, util.KmeansPlusPlus, clients, calls)
+	}
 
 }

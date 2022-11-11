@@ -1,9 +1,9 @@
-package kmeans
+package kmeansAlgo
 
 import (
 	"log"
-	"main/mapreduce"
-	"main/util"
+	"main/code/mapreduce"
+	"main/code/util"
 	"net/rpc"
 )
 

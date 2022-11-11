@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"main/mapreduce"
-	"main/util"
+	"main/code/mapreduce"
+	"main/code/util"
 	"math/rand"
 	"net"
 	"net/http"

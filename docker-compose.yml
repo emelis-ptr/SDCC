@@ -6,7 +6,7 @@ services:
     hostname: registry
     build:
       context: .
-      dockerfile: ./docker/Dockerfile_registration
+      dockerfile: docker/Dockerfile_registration
     env_file: .env
     networks:
       - mapreduce
@@ -18,7 +18,7 @@ services:
     hostname: master
     build:
       context: .
-      dockerfile: ./docker/Dockerfile_master
+      dockerfile: docker/Dockerfile_master
     env_file: .env
     networks:
       - mapreduce
@@ -31,7 +31,7 @@ services:
   worker_s:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile_worker
+      dockerfile: docker/Dockerfile_worker
     env_file: .env
     networks:
       - mapreduce

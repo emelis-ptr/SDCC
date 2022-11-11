@@ -7,7 +7,7 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 	"image/color"
 	"log"
-	"main/mapreduce"
+	"main/code/mapreduce"
 	"math/rand"
 )
 
