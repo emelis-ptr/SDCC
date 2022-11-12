@@ -1,8 +1,13 @@
 cd ..
 
-set NUMWORKER=3
-set NUMPOINT=100
-set NUMCLUSTER=30
+set /p NUMWORKER=3
+
+set /p NUMPOINT=100
+set /p NUMCLUSTER=5
+
+if %NUMCLUSTER% gtr %NUMPOINT% (
+ set /p NUMCLUSTER=
+)
 
 echo %NUMWORKER%
 echo %NUMPOINT%

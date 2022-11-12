@@ -1,14 +1,25 @@
 #!/bin/bash
 cd ..
 
-NUMWORKER=3
-NUMPOINT=100
-NUMCLUSTER=30
+echo "Numero di worker: "
+read NUMWORKER
+
+echo "Numero di punti: "
+read NUMPOINT
+
+echo "Numero di cluster: "
+read NUMCLUSTER
+
+if [ "${NUMCLUSTER}" -ge "${NUMPOINT}" ]; then
+  echo "Numero cluster maggiore dell'insieme dei punti. Riprova"
+  read NUMCLUSTER
+fi
+
 ALGO=""
 
-echo ${NUMWORKER}
-echo ${NUMPOINT}
-echo ${NUMCLUSTER%}
+echo "${NUMWORKER}"
+echo "${NUMPOINT}"
+echo "${NUMCLUSTER}"
 
 echo "Select [1]: LLyod, [2]: standard kmeans, [3]: keans plus plus"
 read algos
@@ -24,8 +35,10 @@ case $algos in
   ;;
 esac
 
-echo NUMWORKER=${NUMWORKER} > .env
-echo NUMPOINT=${NUMPOINT}>> .env
+echo NUMWORKER="${NUMWORKER}" > .env
+# shellcheck disable=SC2129
+echo NUMPOINT="${NUMPOINT}">> .env
+# shellcheck disable=SC2086
 echo NUMCLUSTER=${NUMCLUSTER}>> .env
 echo ALGO=${ALGO}>> .env
 
