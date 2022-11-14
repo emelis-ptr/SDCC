@@ -1,4 +1,4 @@
-package kmeansAlgo
+package algorithm
 
 import (
 	"main/code/mapreduce"
@@ -27,7 +27,7 @@ func InitCentroidStandard(points []mapreduce.Points, numCentroid int) []mapreduc
 	return centroids
 }
 
-func StandardKMeans(numWorker int, numCentroid int, points []mapreduce.Points, algo string, clients []*rpc.Client, calls []*rpc.Call) {
+func StandardKMeans(numWorker int, numCentroid int, numMapper int, numReducer int, points []mapreduce.Points, algo string, clients []*rpc.Client, calls []*rpc.Call) {
 	//Iterazione uguale all'algoritmo di Llyod
-	Llyod(numWorker, numCentroid, points, algo, clients, calls)
+	Llyod(numWorker, numCentroid, numMapper, numReducer, points, algo, clients, calls)
 }

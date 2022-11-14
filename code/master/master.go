@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"main/code/kmeansAlgo"
+	"main/code/algorithm"
 	"main/code/util"
 	"net/rpc"
 	"os"
@@ -22,6 +22,8 @@ func main() {
 	numWorker, _ := strconv.Atoi(os.Getenv(util.NumWorker))
 	numPoint, _ := strconv.Atoi(os.Getenv(util.NumPoint))
 	numCentroid, _ := strconv.Atoi(os.Getenv(util.NumCluster))
+	numMapper, _ := strconv.Atoi(os.Getenv(util.NumMapper))
+	numReducer, _ := strconv.Atoi(os.Getenv(util.NumReducer))
 
 	var registrations util.Registration
 
@@ -55,22 +57,22 @@ func main() {
 		log.Fatalf("Errore! %d worker hanno subito un crash", workerCrash)
 	}
 
-	data := GeneratePoint(numPoint)
-	points := CreateClusteredPoint(data)
+	data := util.GeneratePoint(numPoint)
+	points := util.CreateClusteredPoint(data)
 
 	algo := os.Getenv(util.Algo)
 	switch algo {
 	case util.Llyod:
 		fmt.Println(" ** Llyod **")
-		kmeansAlgo.Llyod(numClient, numCentroid, points, util.Llyod, clients, calls)
+		algorithm.Llyod(numClient, numCentroid, numMapper, numReducer, points, util.Llyod, clients, calls)
 
 	case util.Standard:
 		fmt.Println(" ** Standard KMeans **")
-		kmeansAlgo.StandardKMeans(numClient, numCentroid, points, util.Standard, clients, calls)
+		algorithm.StandardKMeans(numClient, numCentroid, numMapper, numReducer, points, util.Standard, clients, calls)
 
 	case util.KmeansPlusPlus:
 		fmt.Println(" ** KMeans++ **")
-		kmeansAlgo.KMeansPlusPlus(numClient, numCentroid, points, util.KmeansPlusPlus, clients, calls)
+		algorithm.KMeansPlusPlus(numClient, numCentroid, numMapper, points, clients, calls)
 	}
 
 }

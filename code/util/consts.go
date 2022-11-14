@@ -7,7 +7,10 @@ const (
 	Algo       = "ALGO"
 	NumVector  = 2
 
+	NumMapper  = "NUMMAPPER"
+	NumReducer = "NUMREDUCER"
+
 	Llyod          = "llyod"
 	Standard       = "standardKMeans"
-	KmeansPlusPlus = "kmeansAlgo"
+	KmeansPlusPlus = "algorithm"
 )

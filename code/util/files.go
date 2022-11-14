@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	nameFile = "kmeansAlgo"
+	nameFile = "algo"
 )
 
 //Open file .env

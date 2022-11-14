@@ -28,7 +28,6 @@ func (registry *Registry) RegisterMember(arg util.Peer, res *util.Registration) 
 	registration.Index = members
 	members++ // increment the number of registered members
 
-	//*res = waitForAll(registry, arg) // put the member in wait for others and give him the membership
 	registration.Peer = append(registration.Peer, arg)
 	registry.Peer = registration
 	*res = registration

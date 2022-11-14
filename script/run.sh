@@ -2,13 +2,19 @@
 cd ..
 
 echo "Numero di worker: "
-read NUMWORKER
+read -r NUMWORKER
 
 echo "Numero di punti: "
-read NUMPOINT
+read -r NUMPOINT
 
 echo "Numero di cluster: "
-read NUMCLUSTER
+read -r NUMCLUSTER
+
+echo "Numero di mapper: "
+read -r NUMMAPPER
+
+echo "Numero di reducer: "
+read -r NUMREDUCER
 
 if [ "${NUMCLUSTER}" -ge "${NUMPOINT}" ]; then
   echo "Numero cluster maggiore dell'insieme dei punti. Riprova"
@@ -16,10 +22,6 @@ if [ "${NUMCLUSTER}" -ge "${NUMPOINT}" ]; then
 fi
 
 ALGO=""
-
-echo "${NUMWORKER}"
-echo "${NUMPOINT}"
-echo "${NUMCLUSTER}"
 
 echo "Select [1]: LLyod, [2]: standard kmeans, [3]: keans plus plus"
 read algos
@@ -38,12 +40,13 @@ esac
 echo NUMWORKER="${NUMWORKER}" > .env
 # shellcheck disable=SC2129
 echo NUMPOINT="${NUMPOINT}">> .env
-# shellcheck disable=SC2086
-echo NUMCLUSTER=${NUMCLUSTER}>> .env
+echo NUMCLUSTER="${NUMCLUSTER}">> .env
 echo ALGO=${ALGO}>> .env
+echo NUMMAPPER="${NUMMAPPER}">> .env
+echo NUMREDUCER="${NUMREDUCER}">> .env
 
 docker compose build
 
 sleep 10
 
-docker compose up --scale worker_s=${NUMWORKER}
+docker compose up --scale worker_s="${NUMWORKER}"

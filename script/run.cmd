@@ -1,17 +1,38 @@
 cd ..
 
-set /p NUMWORKER=3
+set /p NUMWORKER=
 
-set /p NUMPOINT=100
-set /p NUMCLUSTER=5
-
-if %NUMCLUSTER% gtr %NUMPOINT% (
- set /p NUMCLUSTER=
+if (%NUMWORKER% == 0) (
+   set /p NUMWORKER=
 )
 
-echo %NUMWORKER%
-echo %NUMPOINT%
-echo %NUMCLUSTER%
+set /p NUMPOINT=
+
+if (%NUMPOINT% == 0) (
+   set /p NUMPOINT=
+)
+
+set /p NUMCLUSTER=
+
+if (%NUMCLUSTER% == 0) (
+   set /p NUMCLUSTER=
+)
+
+set /p NUMMAPPER=
+
+if (%NUMMAPPER% == 0) (
+   set /p NUMMAPPER=
+)
+
+set /p NUMREDUCER=
+
+if (%NUMREDUCER% == 0) (
+   set /p NUMREDUCER=
+)
+
+if (%NUMCLUSTER% gtr %NUMPOINT%) (
+ set /p NUMCLUSTER=
+)
 
 CHOICE /C 123 /M "Select [1]: LLyod, [2]: standard kmeans, [3]: keans plus plus"
 set choice=%errorlevel%
@@ -30,6 +51,8 @@ echo NUMWORKER=%NUMWORKER% > .env
 echo NUMPOINT=%NUMPOINT%>> .env
 echo NUMCLUSTER=%NUMCLUSTER%>> .env
 echo ALGO=%ALGO%>> .env
+echo NUMMAPPER=%NUMMAPPER%>> .env
+echo NUMREDUCER=%NUMREDUCER%>> .env
 
 docker-compose build
 
