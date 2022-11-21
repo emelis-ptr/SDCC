@@ -27,9 +27,9 @@ type Registration struct {
 	Index int
 }
 
-// ReadConf read config from json file
-func (c *Conf) ReadConf() {
-	jsonFile, err := os.Open("./config.json")
+// ReadConf : legge le configurazioni dal file json
+func (c *Conf) ReadConf(filePath string) {
+	jsonFile, err := os.Open(filePath)
 	if err != nil {
 		log.Fatalln("Configuration file cannot be open: ", err)
 	}
@@ -49,7 +49,7 @@ func (c *Conf) ReadConf() {
 	}
 }
 
-// GetOutboundIP /*Obtain peer ip
+// GetOutboundIP : ottiene IP
 func GetOutboundIP() string {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {

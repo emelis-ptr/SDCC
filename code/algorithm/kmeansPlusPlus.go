@@ -1,9 +1,9 @@
 package algorithm
 
 import (
+	"SDCC-project/code/mapreduce"
+	"SDCC-project/code/util"
 	"log"
-	"main/code/mapreduce"
-	"main/code/util"
 	"math/rand"
 	"net/rpc"
 )
@@ -17,7 +17,8 @@ import (
 6. Apply the standard k-means MapReduce algorithm, initialized with these means.
 */
 
-func KMeansPlusPlus(numWorker int, numCentroid int, numMapper int, points []mapreduce.Points, clients []*rpc.Client, calls []*rpc.Call) {
+// KMeansPlusPlus : Algoritmo Kmeans
+func KMeansPlusPlus(numWorker int, numCentroid int, numMapper int, points []mapreduce.Points, clients []*rpc.Client, calls []*rpc.Call, testing bool) {
 	centroids := InitCentroidKMeansPlusPlus(points)
 
 	log.Printf("Punti: %d", len(points))
@@ -51,6 +52,11 @@ func KMeansPlusPlus(numWorker int, numCentroid int, numMapper int, points []mapr
 			}
 		}
 
+		if len(centroids) == numCentroid {
+			log.Println("Numero di iterazioni totali: ", it)
+			break
+		}
+
 		jobReduce := util.SplitJobReduce(clusters, numWorker)
 		newCentroids := make([]mapreduce.Centroids, 0)
 		centroids = nil
@@ -63,20 +69,16 @@ func KMeansPlusPlus(numWorker int, numCentroid int, numMapper int, points []mapr
 			}
 		}
 
-		if len(centroids) == numCentroid {
-			log.Println("Numero di iterazioni totali: ", it)
-			break
-		}
-
 		it++
-		for ii := range clusters {
-			log.Printf("Cluster %d con %d punti", clusters[ii].Centroid.Index, len(clusters[ii].PointsData))
+		if testing == false {
+			for ii := range clusters {
+				log.Printf("Cluster %d con %d punti", clusters[ii].Centroid.Index, len(clusters[ii].PointsData))
+			}
 		}
-
 	}
 }
 
-//InitCentroidKMeansPlusPlus Si utilizza k-means++ per determinare i centroidi iniziali
+// InitCentroidKMeansPlusPlus : determina i centroidi iniziali
 func InitCentroidKMeansPlusPlus(points []mapreduce.Points) []mapreduce.Centroids {
 	centroids := make([]mapreduce.Centroids, 0)
 
@@ -87,7 +89,7 @@ func InitCentroidKMeansPlusPlus(points []mapreduce.Points) []mapreduce.Centroids
 	return centroids
 }
 
-// Invia un insieme di punti al worker
+// Suddivide i punti in base al numero di mapper che si vuole utilizzare
 func assignJobsMapKMeans(points []mapreduce.Points, client *rpc.Client, ch chan []mapreduce.Clusters, numMapper int) {
 	channel := make(chan []mapreduce.Clusters)
 	clusterChannel := make([]mapreduce.Clusters, len(points[0].Centroids))
@@ -110,7 +112,7 @@ func assignJobsMapKMeans(points []mapreduce.Points, client *rpc.Client, ch chan 
 	ch <- clusters
 }
 
-// Invia un insieme di punti al worker
+// Invia un insieme di punti al worker che esegue il job tramite la chiamata API
 func assignMapKMeans(points []mapreduce.Points, client *rpc.Client, ch chan []mapreduce.Clusters) {
 	var c []mapreduce.Clusters
 	err := client.Call("API.MapperKMeans", points, &c)

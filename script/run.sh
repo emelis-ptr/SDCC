@@ -1,26 +1,32 @@
 #!/bin/bash
-cd ..
+cd ../docker
 
+#NUMWORKER
 echo "Numero di worker: "
 read -r NUMWORKER
 
+#NUMPOINT
 echo "Numero di punti: "
 read -r NUMPOINT
 
+#NUMCLUSTER
 echo "Numero di cluster: "
 read -r NUMCLUSTER
-
-echo "Numero di mapper: "
-read -r NUMMAPPER
-
-echo "Numero di reducer: "
-read -r NUMREDUCER
 
 if [ "${NUMCLUSTER}" -ge "${NUMPOINT}" ]; then
   echo "Numero cluster maggiore dell'insieme dei punti. Riprova"
   read NUMCLUSTER
 fi
 
+#NUMMAPPER
+echo "Numero di mapper: "
+read -r NUMMAPPER
+
+#NUMREDUCER
+echo "Numero di reducer: "
+read -r NUMREDUCER
+
+#ALGO
 ALGO=""
 
 echo "Select [1]: LLyod, [2]: standard kmeans, [3]: keans plus plus"
@@ -37,16 +43,16 @@ case $algos in
   ;;
 esac
 
-echo NUMWORKER="${NUMWORKER}" > .env
+# Write file
+echo NUMWORKER="${NUMWORKER}" > ../.env
 # shellcheck disable=SC2129
-echo NUMPOINT="${NUMPOINT}">> .env
-echo NUMCLUSTER="${NUMCLUSTER}">> .env
-echo ALGO=${ALGO}>> .env
-echo NUMMAPPER="${NUMMAPPER}">> .env
-echo NUMREDUCER="${NUMREDUCER}">> .env
+echo NUMPOINT="${NUMPOINT}">> ../.env
+echo NUMCLUSTER="${NUMCLUSTER}">> ../.env
+echo ALGO=${ALGO}>> ../.env
+echo NUMMAPPER="${NUMMAPPER}">> ../.env
+echo NUMREDUCER="${NUMREDUCER}">> ../.env
 
-docker compose build
-
+# Docker
+docker compose --profile app build
 sleep 10
-
-docker compose up --scale worker_s="${NUMWORKER}"
+docker compose up -d master_s --scale worker_s="${NUMWORKER}"

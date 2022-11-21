@@ -1,7 +1,7 @@
 package algorithm
 
 import (
-	"main/code/mapreduce"
+	"SDCC-project/code/mapreduce"
 	"math/rand"
 	"net/rpc"
 )
@@ -14,6 +14,7 @@ import (
 5. Repeat steps 2 through 4 until the means have converged.
 */
 
+// InitCentroidStandard Assegna i punti in cluster diversi
 func InitCentroidStandard(points []mapreduce.Points, numCentroid int) []mapreduce.Centroids {
 	centroids := make([]mapreduce.Centroids, numCentroid)
 
@@ -27,7 +28,8 @@ func InitCentroidStandard(points []mapreduce.Points, numCentroid int) []mapreduc
 	return centroids
 }
 
-func StandardKMeans(numWorker int, numCentroid int, numMapper int, numReducer int, points []mapreduce.Points, algo string, clients []*rpc.Client, calls []*rpc.Call) {
+// StandardKMeans : esegue lo stesso procedimento dell'algoritmo Llyod
+func StandardKMeans(numWorker int, numCentroid int, numMapper int, numReducer int, points []mapreduce.Points, algo string, clients []*rpc.Client, calls []*rpc.Call, testing bool) {
 	//Iterazione uguale all'algoritmo di Llyod
-	Llyod(numWorker, numCentroid, numMapper, numReducer, points, algo, clients, calls)
+	Llyod(numWorker, numCentroid, numMapper, numReducer, points, algo, clients, calls, testing)
 }

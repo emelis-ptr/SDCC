@@ -1,10 +1,10 @@
 package main
 
 import (
+	"SDCC-project/code/mapreduce"
+	"SDCC-project/code/util"
 	"fmt"
 	"log"
-	"main/code/mapreduce"
-	"main/code/util"
 	"math/rand"
 	"net"
 	"net/http"
@@ -13,12 +13,15 @@ import (
 	"time"
 )
 
+/*
+Esecuzione del worker
+*/
 func main() {
 	fmt.Println("Worker is up")
 
 	var reply util.Registration
 	var conf util.Conf
-	conf.ReadConf()
+	conf.ReadConf(util.ConfPath)
 
 	api := new(mapreduce.API)
 	err := rpc.Register(api)

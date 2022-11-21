@@ -1,61 +1,69 @@
-cd ..
+cd ../docker
 
-set /p NUMWORKER=
+Rem NUMWORKER
+set /p NUMWORKER=""
 
 if (%NUMWORKER% == 0) (
-   set /p NUMWORKER=
+   set /p NUMWORKER=""
 )
 
-set /p NUMPOINT=
+Rem NUMPOINT
+set /p NUMPOINT=""
 
 if (%NUMPOINT% == 0) (
-   set /p NUMPOINT=
+   set /p NUMPOINT=""
 )
 
-set /p NUMCLUSTER=
+Rem NUMCLUSTER
+set /p NUMCLUSTER=""
 
 if (%NUMCLUSTER% == 0) (
-   set /p NUMCLUSTER=
-)
-
-set /p NUMMAPPER=
-
-if (%NUMMAPPER% == 0) (
-   set /p NUMMAPPER=
-)
-
-set /p NUMREDUCER=
-
-if (%NUMREDUCER% == 0) (
-   set /p NUMREDUCER=
+   set /p NUMCLUSTER=""
 )
 
 if (%NUMCLUSTER% gtr %NUMPOINT%) (
- set /p NUMCLUSTER=
+ set /p NUMCLUSTER=""
 )
 
-CHOICE /C 123 /M "Select [1]: LLyod, [2]: standard kmeans, [3]: keans plus plus"
-set choice=%errorlevel%
+Rem NUMMAPPER
+set /p NUMMAPPER=""
 
-if %choice%==1 (
+if (%NUMMAPPER% == 0) (
+   set /p NUMMAPPER=""
+)
+
+Rem NUMREDUCER
+set /p NUMREDUCER=""
+
+if (%NUMREDUCER% == 0) (
+   set /p NUMREDUCER=""
+)
+
+Rem ALGO
+CHOICE /C 123 /M "Select [1]: LLyod, [2]: standard kmeans, [3]: keans plus plus"
+set CHOICE=%errorlevel%
+
+if %CHOICE%==1 (
  set ALGO=llyod
 )
-if %choice%==2 (
+if %CHOICE%==2 (
  set ALGO=standardKMeans
 )
-if %choice%==3 (
+if %CHOICE%==3 (
  set ALGO=kmeansAlgo
 )
 
-echo NUMWORKER=%NUMWORKER% > .env
-echo NUMPOINT=%NUMPOINT%>> .env
-echo NUMCLUSTER=%NUMCLUSTER%>> .env
-echo ALGO=%ALGO%>> .env
-echo NUMMAPPER=%NUMMAPPER%>> .env
-echo NUMREDUCER=%NUMREDUCER%>> .env
+Rem Write file
+(
+echo NUMWORKER=%NUMWORKER%
+echo NUMPOINT=%NUMPOINT%
+echo NUMCLUSTER=%NUMCLUSTER%
+echo NUMMAPPER=%NUMMAPPER%
+echo NUMREDUCER=%NUMREDUCER%
+echo ALGO=%ALGO%
+)> ../.env
 
-docker-compose build
-
+Rem docker
+docker-compose --profile app build
 timeout 10
-
-docker-compose up --scale worker_s=%NUMWORKER%
+docker-compose up -d master_s --scale worker_s=%NUMWORKER%

@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM golang:1.17-alpine
-ADD . /code/master
-WORKDIR /code/master
+ADD . /code/master-worker/master
+WORKDIR /code/master-worker/master
 COPY . .
 #RUN go mod download
-RUN go build -o ./main ./code/master
+RUN go build -o ./main ./code/master-worker/master
 ENTRYPOINT ["./main"]

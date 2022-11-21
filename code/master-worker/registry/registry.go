@@ -1,11 +1,11 @@
 package main
 
 import (
+	"SDCC-project/code/util"
 	"context"
 	"fmt"
 	"golang.org/x/sync/errgroup"
 	"log"
-	"main/code/util"
 	"net"
 	"net/http"
 	"net/rpc"
@@ -22,11 +22,11 @@ type Registry struct {
 var members = 0
 var registration util.Registration
 
-// RegisterMember adds a new member and returns in res the memberhip when all members are registered
+// RegisterMember : aggiunge un nuovo membro e ritorna in res la membership quando tutti sono stati registrati
 func (registry *Registry) RegisterMember(arg util.Peer, res *util.Registration) error {
 
 	registration.Index = members
-	members++ // increment the number of registered members
+	members++ // incrementa il numero di membri registrati
 
 	registration.Peer = append(registration.Peer, arg)
 	registry.Peer = registration
@@ -35,6 +35,7 @@ func (registry *Registry) RegisterMember(arg util.Peer, res *util.Registration) 
 	return nil
 }
 
+// RetrieveMember : recuper la membership
 func (registry *Registry) RetrieveMember(bool bool, res *util.Registration) error {
 	registration = registry.Peer
 
@@ -45,6 +46,10 @@ func (registry *Registry) RetrieveMember(bool bool, res *util.Registration) erro
 	return nil
 }
 
+/*
+*
+Esecuzione del registry
+*/
 func main() {
 	var err error
 
@@ -52,9 +57,9 @@ func main() {
 
 	util.OpenEnv()
 
-	//read configuration
+	//read config
 	var conf util.Conf
-	conf.ReadConf()
+	conf.ReadConf(util.ConfPath)
 
 	//expose api on open port
 	err = rpc.Register(new(Registry))

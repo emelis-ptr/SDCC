@@ -13,4 +13,8 @@ const (
 	Llyod          = "llyod"
 	Standard       = "standardKMeans"
 	KmeansPlusPlus = "algorithm"
+
+	NameFile = "algo"
+
+	ConfPath = "./config.json"
 )

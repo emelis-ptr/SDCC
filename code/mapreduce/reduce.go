@@ -6,6 +6,7 @@ import (
 	"math/rand"
 )
 
+// Reduce : per ogni cluster calcola la media del nuovo centroide
 func (a *API) Reduce(clusters []Clusters, centroid *[]Centroids) error {
 	fmt.Println(" ")
 	log.Printf(" ** Reduce phase **")
@@ -27,6 +28,7 @@ func (a *API) Reduce(clusters []Clusters, centroid *[]Centroids) error {
 
 				p := make([][]float64, lenPoint)
 
+				// Calcola la media di ogni cluster
 				for j := range clusters[ii].PointsData {
 					for k := range clusters[ii].PointsData[j].Point {
 						p[k] = append(p[k], clusters[ii].PointsData[j].Point[k])
@@ -54,9 +56,9 @@ func (a *API) Reduce(clusters []Clusters, centroid *[]Centroids) error {
 }
 
 // ReduceKMeans
-//We reduce the first element of two value pairs
-//by choosing one of these elements with probability proportional to the second
-//element in each pair, and reduce the second element of the pairs by summation.
+// We reduce the first element of two value pairs
+// by choosing one of these elements with probability proportional to the second
+// element in each pair, and reduce the second element of the pairs by summation.
 func (a *API) ReduceKMeans(clusters []Clusters, centroid *[]Centroids) error {
 	fmt.Println(" ")
 	log.Printf(" ** Reduce phase **")
@@ -78,6 +80,7 @@ func (a *API) ReduceKMeans(clusters []Clusters, centroid *[]Centroids) error {
 
 				p := make([][]float64, lenPoint)
 
+				// Calcola la media di ogni cluster
 				for j := range clusters[ii].PointsData {
 					for k := range clusters[ii].PointsData[j].Point {
 						p[k] = append(p[k], clusters[ii].PointsData[j].Point[k])
@@ -111,6 +114,7 @@ func (a *API) ReduceKMeans(clusters []Clusters, centroid *[]Centroids) error {
 		}
 	}
 
+	// Calcola il nuovo centroide in base ad una distanza casuale calcolata come somma delle distanze dei punti
 	if (len(point)) != 0 {
 		distance := make([]float64, len(point))
 		var c Centroids

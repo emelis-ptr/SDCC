@@ -7,6 +7,17 @@ MapReduce.
 
 Sono stati implementati tre diversi algoritimi kmeans: **_llyod, kmeans standard e kmeans++_**.
 ### Running
+Sul file di script run, viene avviata l'esecuzione dei container dell'applicazione implementata: 
+```
+docker-compose up -d master_s --scale worker_s=%NUMWORKER% 
+```
+
+Sul file di script benchmark, viene avviata l'esecuzione del benchmar (il main in questo caso agisce come
+master ma esegue i test con un numero diverso di punti, mapper e reducer):
+```
+docker compose --profile app up benchmark_s --scale worker_s=%NUMWORKER%
+```
+
 #### Locale
 Per eseguire l'applicazione in locale è necessario aver installato:
 - Docker Compose per Windows

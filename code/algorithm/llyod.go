@@ -1,9 +1,9 @@
 package algorithm
 
 import (
+	"SDCC-project/code/mapreduce"
+	"SDCC-project/code/util"
 	"log"
-	"main/code/mapreduce"
-	"main/code/util"
 	"math/rand"
 	"net/rpc"
 )
@@ -31,6 +31,7 @@ Re-compute cluster centroids;
 Until no improvement is made;
 */
 
+// InitCentroidLlyod : assegna i punti in cluster diversi
 func InitCentroidLlyod(points []mapreduce.Points, numCentroid int) []mapreduce.Centroids {
 	centroids := make([]mapreduce.Centroids, numCentroid)
 
@@ -44,7 +45,8 @@ func InitCentroidLlyod(points []mapreduce.Points, numCentroid int) []mapreduce.C
 	return centroids
 }
 
-func Llyod(numWorker int, numCentroid int, numMapper int, numReducer int, points []mapreduce.Points, algo string, clients []*rpc.Client, calls []*rpc.Call) {
+// Llyod : algoritmo
+func Llyod(numWorker int, numCentroid int, numMapper int, numReducer int, points []mapreduce.Points, algo string, clients []*rpc.Client, calls []*rpc.Call, testing bool) {
 	//creazione di punti e centroidi
 	centroids := CreateInitValue(algo, numCentroid, points)
 
@@ -87,11 +89,12 @@ func Llyod(numWorker int, numCentroid int, numMapper int, numReducer int, points
 		}
 		it++
 
-		log.Printf("Iterazione numero: %d", it)
-		for ii := range clusters {
-			log.Printf("Cluster %d con %d punti", clusters[ii].Centroid.Index, len(clusters[ii].PointsData))
+		if !testing {
+			log.Printf("Iterazione numero: %d", it)
+			for ii := range clusters {
+				log.Printf("Cluster %d con %d punti", clusters[ii].Centroid.Index, len(clusters[ii].PointsData))
+			}
 		}
-
 		jobReduce := util.SplitJobReduce(clusters, numWorker)
 		newCentroids := make([]mapreduce.Centroids, 0)
 		channelR := make(chan []mapreduce.Centroids)
@@ -112,7 +115,7 @@ func Llyod(numWorker int, numCentroid int, numMapper int, numReducer int, points
 	}
 }
 
-// Invia un insieme di punti al worker
+// Suddivide i punti per ogni worker in base al numero di mapper specificato che si vuole utilizzare
 func assignJobsMap(points []mapreduce.Points, client *rpc.Client, ch chan []mapreduce.Clusters, numMapper int) {
 	channel := make(chan []mapreduce.Clusters)
 	clusterChannel := make([]mapreduce.Clusters, len(points[0].Centroids))
@@ -135,6 +138,7 @@ func assignJobsMap(points []mapreduce.Points, client *rpc.Client, ch chan []mapr
 	ch <- clusters
 }
 
+// Ogni worker esegue una chiama API.Mapper
 func assignMap(i int, client *rpc.Client, jobMap [][]mapreduce.Points, ch chan []mapreduce.Clusters) {
 	var c []mapreduce.Clusters
 	err := client.Call("API.Mapper", jobMap[i], &c)
@@ -145,6 +149,7 @@ func assignMap(i int, client *rpc.Client, jobMap [][]mapreduce.Points, ch chan [
 	ch <- c
 }
 
+// Ogni worker esegue la chiamata API.Reduce
 func assignReduce(calls []*rpc.Call, clients []*rpc.Client, i int, jobReduce []mapreduce.Clusters, ch chan []mapreduce.Centroids) {
 	newCentroids := make([]mapreduce.Centroids, 0)
 
