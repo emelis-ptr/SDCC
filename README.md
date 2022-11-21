@@ -12,7 +12,7 @@ Sul file di script run, viene avviata l'esecuzione dei container dell'applicazio
 docker-compose up -d master_s --scale worker_s=%NUMWORKER% 
 ```
 
-Sul file di script benchmark, viene avviata l'esecuzione del benchmar (il main in questo caso agisce come
+Sul file di script benchmark, viene avviata l'esecuzione del benchmark (il main in questo caso agisce come
 master ma esegue i test con un numero diverso di punti, mapper e reducer):
 ```
 docker compose --profile app up benchmark_s --scale worker_s=%NUMWORKER%
