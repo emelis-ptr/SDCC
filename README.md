@@ -47,10 +47,10 @@ aws configure
 
 #il comando per far sì che la chiave non sia visualizzabile pubblicamente. 
 chmod 400 key-sdcc.pem
-
-#Connettersi all'istanza: 
-ssh -i key-sdcc.pem ec2-user@<IndirizzoIP dell'istanza>
 ```
+
+Connettersi all'istanza: 
+- `ssh -i key-sdcc.pem ec2-user@<IndirizzoIP dell'istanza>`
 
 Una volta connessi all'istanza:
 ```
@@ -72,15 +72,20 @@ sudo usermod -a -G docker ec2-user
 
 #bisogna eseguire comando per far si che le configurazioni vengano applicate
 exit 
+```
 
-#rieseguire il comando
-ssh -i key-sdcc.pem ec2-user@<IndirizzoIP dell'istanza>
+Rieseguire il comando:
+ - `ssh -i key-sdcc.pem ec2-user@<IndirizzoIP dell'istanza>`
 
+```
 # clonare repository
 git clone https://github.com/emelis-ptr/SDCC-project.git
 
 # cartella contenente script
 cd SDCC-project/script
+
+# eseguire script
+sh run.sh
 ```
 
 E' possibile eseguire l'applicazione attraverso lo script con il comando:
