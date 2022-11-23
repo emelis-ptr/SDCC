@@ -83,6 +83,9 @@ git clone https://github.com/emelis-ptr/SDCC-project.git
 
 # cartella contenente script
 cd SDCC-project/script
+
+# eseguire script
+sh run.sh
 ```
 
 E' possibile eseguire l'applicazione attraverso lo script con il comando:
