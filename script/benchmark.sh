@@ -3,8 +3,12 @@ cd ../docker
 
 echo "Benchmark after execution main [y] - Benchmark with no execution main[n]"
 read benchmark
+
 case $benchmark in
 y) echo ""
+  #NUMWORKER
+    echo "Inserisci numero worker: "
+    read -r NUMWORKER
   ;;
 n) echo ""
   #NUMWORKER

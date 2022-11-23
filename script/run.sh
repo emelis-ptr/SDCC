@@ -55,4 +55,4 @@ echo NUMREDUCER="${NUMREDUCER}">> ../.env
 # Docker
 docker compose --profile app build
 sleep 10
-docker compose up -d master_s --scale worker_s="${NUMWORKER}"
+docker compose up master_s --scale worker_s="${NUMWORKER}"
