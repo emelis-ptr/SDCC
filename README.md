@@ -7,12 +7,12 @@ MapReduce.
 
 Sono stati implementati tre diversi algoritimi kmeans: **_llyod, kmeans standard e kmeans++_**.
 ### Running
-Sul file di script run, viene avviata l'esecuzione dei container dell'applicazione implementata: 
+Sul file di script [run](script/run.cmd), viene avviata l'esecuzione dei container dell'applicazione implementata: 
 ```
 docker-compose up -d master_s --scale worker_s=%NUMWORKER% 
 ```
 
-Sul file di script benchmark, viene avviata l'esecuzione del benchmark (il main in questo caso agisce come
+Sul file di script [benchmark](script/benchmark.cmd), viene avviata l'esecuzione del benchmark (il main in questo caso agisce come
 master ma esegue i test con un numero diverso di punti, mapper e reducer):
 ```
 docker compose --profile app up benchmark_s --scale worker_s=%NUMWORKER%
@@ -23,20 +23,28 @@ Per eseguire l'applicazione in locale è necessario aver installato:
 - Docker Compose per Windows
 
 All'interno della cartella script, esiste un file necessario per l'esecuzione. 
-- Per avviare: `run.cmd`.
-- Per terminare ed eliminare i container: `stop.cmd`
+- Per avviare: [`run.cmd`](script/run.cmd)
+- Per terminare ed eliminare i container: [`stop.cmd`](script/stop.cmd)
 
 #### EC2
 Per eseguire l'applicazione su un'istanza EC2, è necessario:
 - AWS Cli
 - Git bash
 
-Dopo aver avviato un'istanza EC2 e aver salvato la chiave in locale, bisogna:
-- Aprire un client SSH, nel nostro caso git bash 
-- Individuare il file della chiave privata. La chiave utilizzata per avviare questa istanza è key-sdcc.pem 
+Su aws, bisogna:
+- creare la chiave privata con nome "key-sdcc" e salvarla all'interno della cartella script
+- creare una security group con regole di entrata e uscita:
+  - Regola 1: SSH con porta 22 e destinazione: 0.0.0.0/0
+  - Regola 2: HTTPS con porta 443 e destinazione: 0.0.0.0/0
+
+Per creare un'istanza su aws: [`create_ec2.sh`](script/create_ec2.sh). Bisogna specificare
+all'interno del file: AMI e security groud ID.
 
 Eseguire:
 ``` 
+#inserire AWS Acces Key ID, AWS Secret Access Key e region name: eu-cental-1
+aws configure
+
 #il comando per far sì che la chiave non sia visualizzabile pubblicamente. 
 chmod 400 key-sdcc.pem
 
@@ -48,6 +56,7 @@ Una volta connessi all'istanza:
 ```
 #installare docker
 sudo yum install -y docker
+sudo yum install -y git
 
 #eseguire docker
 sudo service docker start
@@ -66,11 +75,23 @@ exit
 
 #rieseguire il comando
 ssh -i key-sdcc.pem ec2-user@<IndirizzoIP dell'istanza>
+
+# clonare repository
+git clone https://github.com/emelis-ptr/SDCC-project.git
+
+# cartella contenente script
+cd SDCC-project/script
 ```
 
 E' possibile eseguire l'applicazione attraverso lo script con il comando:
- - Per avviare: `sh run.sh`
- - Per terminare ed eliminare i container: ` sh stop.sh`
+ - Per avviare: [`sh run.sh`](script/run.sh)
+ - Per terminare ed eliminare i container: [`sh stop.sh`](script/stop.sh)
 
+Per terminare l'istanza su aws, eseguire il comando:
+`aws ec2 terminate-instances --instance-ids [Instanza ID]`
 
+#### Benchmark
+Per testare le prestazioni dell'applicazione, avviare lo script:
+- [`sh benchmark.sh`](script/benchmark.sh), o
+- [`benchmark.cmd`](script/benchmark.cmd)
 

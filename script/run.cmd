@@ -66,4 +66,4 @@ echo ALGO=%ALGO%
 Rem docker
 docker-compose --profile app build
 timeout 10
-docker-compose up -d master_s --scale worker_s=%NUMWORKER%
+docker-compose up master_s --scale worker_s=%NUMWORKER%

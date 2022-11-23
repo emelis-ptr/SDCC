@@ -18,21 +18,21 @@ var numReducer int
 var algo string
 
 func main() {
-	for _, a := range algos {
-		algo = a.input
-		log.Printf("Algorithm: %s", a.input)
-		for _, p := range points {
-			numPoint = p.input
-			for _, m := range mappers {
-				numMapper = m.input
+	for _, a := range util.Algos {
+		algo = a.Input
+		log.Printf("Algorithm: %s", a.Input)
+		for _, p := range util.Points {
+			numPoint = p.Input
+			for _, m := range util.Mappers {
+				numMapper = m.Input
 				if algo != util.KmeansPlusPlus {
-					for _, r := range reducers {
-						log.Printf("Point: %d - Mapper: %d - Reducer: %d", p.input, m.input, r.input)
-						numReducer = r.input
+					for _, r := range util.Reducers {
+						log.Printf("Point: %d - Mapper: %d - Reducer: %d", p.Input, m.Input, r.Input)
+						numReducer = r.Input
 						Benchmark()
 					}
 				} else {
-					log.Printf("Point: %d - Mapper: %d - Reducer: %d", p.input, m.input, 1)
+					log.Printf("Point: %d - Mapper: %d - Reducer: %d", p.Input, m.Input, 1)
 					Benchmark()
 				}
 			}
@@ -65,38 +65,4 @@ func BenchmarkMaster(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		master.Master(numWorker, numPoint, numCentroid, numMapper, numReducer, algo, regIP, regPort, true)
 	}
-}
-
-/** INPUT */
-
-var points = []struct {
-	input int
-}{
-	{input: 100},
-	{input: 500},
-	{input: 2000},
-}
-
-var mappers = []struct {
-	input int
-}{
-	{input: 2},
-	{input: 5},
-	{input: 10},
-}
-
-var reducers = []struct {
-	input int
-}{
-	{input: 2},
-	{input: 5},
-	{input: 10},
-}
-
-var algos = []struct {
-	input string
-}{
-	{input: util.Llyod},
-	{input: util.Standard},
-	{input: util.KmeansPlusPlus},
 }
