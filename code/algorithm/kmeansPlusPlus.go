@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/rpc"
+	"sync"
 )
 
 /**
@@ -17,65 +18,17 @@ import (
 6. Apply the standard k-means MapReduce algorithm, initialized with these means.
 */
 
-// KMeansPlusPlus : Algoritmo Kmeans
-func KMeansPlusPlus(numWorker int, numCentroid int, numMapper int, points []mapreduce.Points, clients []*rpc.Client, calls []*rpc.Call, testing bool) {
-	centroids := InitCentroidKMeansPlusPlus(points)
+var wg sync.WaitGroup
 
+// KMeansPlusPlus : Algoritmo Kmeans
+func KMeansPlusPlus(numWorker int, numCentroid int, numMapper int, numReducer int, points []mapreduce.Points, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call, testing bool) {
 	log.Printf("Punti: %d", len(points))
 
-	jobMap := util.SplitJobMap(points, numWorker)
+	newCentroids := getCentroids(points, numWorker, numCentroid, centroids, clients, calls)
+	log.Println("Fine iterazione dei centroidi ")
 
-	var it int
-	log.Printf("Inizio iterazione dell'algoritmo")
-	for {
-		log.Printf("Centroidi: %d", len(centroids))
-
-		channel := make(chan []mapreduce.Clusters)
-		clusterChannel := make([]mapreduce.Clusters, len(centroids))
-		clusters := make([]mapreduce.Clusters, len(centroids))
-
-		for i := 0; i < len(points); i++ {
-			points[i].Centroids = centroids
-		}
-
-		//Assegnazione righe ai mapper.
-		for i := range jobMap {
-			go assignJobsMapKMeans(jobMap[i], clients[i], channel, numMapper)
-			clusterChannel = <-channel
-
-			for j := range clusterChannel {
-				clusters[j].Centroid = clusterChannel[j].Centroid
-				clusters[j].Changes += clusterChannel[j].Changes
-				for k := range clusterChannel[j].PointsData {
-					clusters[j].PointsData = append(clusters[j].PointsData, clusterChannel[j].PointsData[k])
-				}
-			}
-		}
-
-		if len(centroids) == numCentroid {
-			log.Println("Numero di iterazioni totali: ", it)
-			break
-		}
-
-		jobReduce := util.SplitJobReduce(clusters, numWorker)
-		newCentroids := make([]mapreduce.Centroids, 0)
-		centroids = nil
-
-		for i := range jobReduce {
-			calls[i] = clients[i].Go("API.ReduceKMeans", jobReduce[i], &newCentroids, nil)
-			calls[i] = <-calls[i].Done
-			for j := range newCentroids {
-				centroids = append(centroids, newCentroids[j])
-			}
-		}
-
-		it++
-		if testing == false {
-			for ii := range clusters {
-				log.Printf("Cluster %d con %d punti", clusters[ii].Centroid.Index, len(clusters[ii].PointsData))
-			}
-		}
-	}
+	//Stesso procedimento dell'algoritmo Llyod
+	Llyod(numWorker, numMapper, numReducer, points, newCentroids, clients, calls, testing)
 }
 
 // InitCentroidKMeansPlusPlus : determina i centroidi iniziali
@@ -89,35 +42,50 @@ func InitCentroidKMeansPlusPlus(points []mapreduce.Points) []mapreduce.Centroids
 	return centroids
 }
 
-// Suddivide i punti in base al numero di mapper che si vuole utilizzare
-func assignJobsMapKMeans(points []mapreduce.Points, client *rpc.Client, ch chan []mapreduce.Clusters, numMapper int) {
-	channel := make(chan []mapreduce.Clusters)
-	clusterChannel := make([]mapreduce.Clusters, len(points[0].Centroids))
-	clusters := make([]mapreduce.Clusters, len(points[0].Centroids))
-	jobMap := util.SplitJobMap(points, numMapper)
+// Iterazione per la scelta dei centroidi per l'algoritmo kmeans++
+func getCentroids(points []mapreduce.Points, numWorker int, numCentroid int, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call) []mapreduce.Centroids {
+	jobMap := util.SplitJobMap(points, numWorker)
 
-	for i := range jobMap {
-		go assignMapKMeans(jobMap[i], client, channel)
-		clusterChannel = <-channel
+	log.Println("Inizio iterazione dei centroidi")
+	for {
+		worker := rand.Intn(numWorker)
+		for i := 0; i < len(points); i++ {
+			points[i].Centroids = centroids
+		}
 
-		for j := range clusterChannel {
-			clusters[j].Centroid = clusterChannel[j].Centroid
-			clusters[j].Changes += clusterChannel[j].Changes
-			for k := range clusterChannel[j].PointsData {
-				clusters[j].PointsData = append(clusters[j].PointsData, clusterChannel[j].PointsData[k])
+		pointsChannel := make(chan []mapreduce.Points, len(points))
+		pointsCh := make([]mapreduce.Points, len(points))
+		for i := range jobMap {
+			wg.Add(1)
+			go assignMapKMeans(jobMap[i], clients[i], pointsChannel)
+			pointsCh = <-pointsChannel
+			for j := range pointsCh {
+				points[j].Distance = pointsCh[j].Distance
 			}
 		}
-	}
 
-	ch <- clusters
+		var newCentroids []mapreduce.Centroids
+
+		calls[worker] = clients[worker].Go("API.ReduceKMeans", points, &newCentroids, nil)
+		calls[worker] = <-calls[worker].Done
+
+		centroids = append(centroids, newCentroids[0])
+
+		if len(centroids) == numCentroid {
+			break
+		}
+	}
+	wg.Wait()
+	return centroids
 }
 
 // Invia un insieme di punti al worker che esegue il job tramite la chiamata API
-func assignMapKMeans(points []mapreduce.Points, client *rpc.Client, ch chan []mapreduce.Clusters) {
-	var c []mapreduce.Clusters
+func assignMapKMeans(points []mapreduce.Points, client *rpc.Client, ch chan []mapreduce.Points) {
+	defer wg.Done()
+	var c []mapreduce.Points
 	err := client.Call("API.MapperKMeans", points, &c)
 	if err != nil {
-		log.Fatal("Error in API.Mapper: ", err)
+		log.Fatal("Error in API.MapperKmeans: ", err)
 	}
 	ch <- c
 }

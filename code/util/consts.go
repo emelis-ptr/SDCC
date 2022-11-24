@@ -12,7 +12,7 @@ const (
 
 	Llyod          = "llyod"
 	Standard       = "standardKMeans"
-	KmeansPlusPlus = "algorithm"
+	KmeansPlusPlus = "kmeansPlusPlus"
 
 	NameFile = "algo"
 
@@ -33,8 +33,8 @@ var Mappers = []struct {
 	Input int
 }{
 	{Input: 2},
-	{Input: 5},
 	{Input: 10},
+	{Input: 30},
 }
 
 var Reducers = []struct {

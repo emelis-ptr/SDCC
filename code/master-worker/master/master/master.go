@@ -55,15 +55,19 @@ func Master(numWorker int, numPoint int, numCentroid int, numMapper int, numRedu
 	switch algo {
 	case util.Llyod:
 		fmt.Println(" ** Llyod **")
-		algorithm.Llyod(numClient, numCentroid, numMapper, numReducer, points, util.Llyod, clients, calls, testing)
+		//creazione di punti e centroidi
+		centroids := algorithm.CreateInitValue(algo, numCentroid, points)
+		algorithm.Llyod(numClient, numMapper, numReducer, points, centroids, clients, calls, testing)
 
 	case util.Standard:
 		fmt.Println(" ** Standard KMeans **")
-		algorithm.StandardKMeans(numClient, numCentroid, numMapper, numReducer, points, util.Standard, clients, calls, testing)
+		centroids := algorithm.CreateInitValue(algo, numCentroid, points)
+		algorithm.StandardKMeans(numClient, numMapper, numReducer, points, centroids, clients, calls, testing)
 
 	case util.KmeansPlusPlus:
 		fmt.Println(" ** KMeans++ **")
-		algorithm.KMeansPlusPlus(numClient, numCentroid, numMapper, points, clients, calls, testing)
+		centroids := algorithm.InitCentroidKMeansPlusPlus(points)
+		algorithm.KMeansPlusPlus(numClient, numCentroid, numMapper, numReducer, points, centroids, clients, calls, testing)
 	}
 
 	/*rpc.HandleHTTP()
