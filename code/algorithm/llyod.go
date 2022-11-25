@@ -47,9 +47,10 @@ func InitCentroidLlyod(points []mapreduce.Points, numCentroid int) []mapreduce.C
 }
 
 // Llyod : algoritmo
-func Llyod(numWorker int, numMapper int, numReducer int, points []mapreduce.Points, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call, testing bool) {
-	log.Printf("Punti: %d", len(points))
-	log.Printf("Centroidi: %d", len(centroids))
+func Llyod(numWorker int, numMapper int, numReducer int, points []mapreduce.Points, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call, testing bool, algo string) {
+	log.Printf("Worker: %d", len(clients))
+	log.Printf("Punti: %d - Centroidi: %d", len(points), len(centroids))
+	log.Printf("Mapper: %d - Reducer: %d", numMapper, numReducer)
 
 	jobMap := util.SplitJobMap(points, numWorker)
 	var changes []int
@@ -83,6 +84,8 @@ func Llyod(numWorker int, numMapper int, numReducer int, points []mapreduce.Poin
 		changes, isChanged = util.CheckChanges(clusters, changes)
 		if isChanged {
 			log.Println("Numero di iterazioni totali: ", it)
+			util.Plot(clusters, numMapper, numReducer, len(points))
+			util.WriteClusters(clusters, len(points), numMapper, numReducer, algo)
 			break
 		}
 
@@ -93,13 +96,13 @@ func Llyod(numWorker int, numMapper int, numReducer int, points []mapreduce.Poin
 				log.Printf("Cluster %d con %d punti", clusters[ii].Centroid.Index, len(clusters[ii].PointsData))
 			}
 		}
-		jobReduce := util.SplitJobReduce(clusters, numReducer)
+		jobReduce := util.SplitJobReduce(clusters, numWorker)
 		newCentroids := make([]mapreduce.Centroids, 0)
 		channelR := make(chan []mapreduce.Centroids)
 		centroids = nil
 
 		for i := range jobReduce {
-			jobReduce2 := util.SplitJobReduce(jobReduce[i], numWorker)
+			jobReduce2 := util.SplitJobReduce(jobReduce[i], numReducer)
 
 			for j := range jobReduce2 {
 				go assignReduce(calls, clients, i, jobReduce2[j], channelR)

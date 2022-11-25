@@ -16,7 +16,8 @@ const (
 
 	NameFile = "algo"
 
-	ConfPath = "./config.json"
+	ConfPath  = "./config.json"
+	DirVolume = "/doc"
 )
 
 /** INPUT */

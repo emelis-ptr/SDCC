@@ -26,5 +26,5 @@ func main() {
 	numReducer, _ := strconv.Atoi(os.Getenv(util.NumReducer))
 	algo := os.Getenv(util.Algo)
 
-	master.Master(numWorker, numPoint, numCentroid, numMapper, numReducer, algo, conf.RegIP, conf.RegPort, false)
+	master.Master(numWorker, numPoint, numCentroid, numMapper, numReducer, algo, conf.RegIP, conf.RegPort, conf.MasterPort, false)
 }

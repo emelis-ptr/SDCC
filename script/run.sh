@@ -56,3 +56,5 @@ echo NUMREDUCER="${NUMREDUCER}">> ../.env
 docker compose --profile app build
 sleep 10
 docker compose up master_s --scale worker_s="${NUMWORKER}"
+docker container start master
+docker cp master:/doc ./

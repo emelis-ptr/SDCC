@@ -12,7 +12,7 @@ import (
 
 // Master : master che prende dal registry i worker che sono stati registrati e assegna loro
 // un job da eseguire
-func Master(numWorker int, numPoint int, numCentroid int, numMapper int, numReducer int, algo string, regIP string, regPort int, testing bool) {
+func Master(numWorker int, numPoint int, numCentroid int, numMapper int, numReducer int, algo string, regIP string, regPort int, portMaster int, testing bool) {
 	var registrations util.Registration
 
 	var bools bool
@@ -57,17 +57,17 @@ func Master(numWorker int, numPoint int, numCentroid int, numMapper int, numRedu
 		fmt.Println(" ** Llyod **")
 		//creazione di punti e centroidi
 		centroids := algorithm.CreateInitValue(algo, numCentroid, points)
-		algorithm.Llyod(numClient, numMapper, numReducer, points, centroids, clients, calls, testing)
+		algorithm.Llyod(numClient, numMapper, numReducer, points, centroids, clients, calls, testing, util.Llyod)
 
 	case util.Standard:
 		fmt.Println(" ** Standard KMeans **")
 		centroids := algorithm.CreateInitValue(algo, numCentroid, points)
-		algorithm.StandardKMeans(numClient, numMapper, numReducer, points, centroids, clients, calls, testing)
+		algorithm.StandardKMeans(numClient, numMapper, numReducer, points, centroids, clients, calls, testing, util.Standard)
 
 	case util.KmeansPlusPlus:
 		fmt.Println(" ** KMeans++ **")
 		centroids := algorithm.InitCentroidKMeansPlusPlus(points)
-		algorithm.KMeansPlusPlus(numClient, numCentroid, numMapper, numReducer, points, centroids, clients, calls, testing)
+		algorithm.KMeansPlusPlus(numClient, numCentroid, numMapper, numReducer, points, centroids, clients, calls, testing, util.KmeansPlusPlus)
 	}
 
 	/*rpc.HandleHTTP()

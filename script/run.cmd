@@ -67,3 +67,5 @@ Rem docker
 docker-compose --profile app build
 timeout 10
 docker-compose up master_s --scale worker_s=%NUMWORKER%
+docker container start master
+docker cp master:/doc ./

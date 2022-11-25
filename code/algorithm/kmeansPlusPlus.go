@@ -21,14 +21,12 @@ import (
 var wg sync.WaitGroup
 
 // KMeansPlusPlus : Algoritmo Kmeans
-func KMeansPlusPlus(numWorker int, numCentroid int, numMapper int, numReducer int, points []mapreduce.Points, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call, testing bool) {
-	log.Printf("Punti: %d", len(points))
-
-	newCentroids := getCentroids(points, numWorker, numCentroid, centroids, clients, calls)
+func KMeansPlusPlus(numWorker int, numCentroid int, numMapper int, numReducer int, points []mapreduce.Points, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call, testing bool, algo string) {
+	newCentroids := centroidsKmeansPP(points, numWorker, numCentroid, centroids, clients, calls)
 	log.Println("Fine iterazione dei centroidi ")
 
 	//Stesso procedimento dell'algoritmo Llyod
-	Llyod(numWorker, numMapper, numReducer, points, newCentroids, clients, calls, testing)
+	Llyod(numWorker, numMapper, numReducer, points, newCentroids, clients, calls, testing, algo)
 }
 
 // InitCentroidKMeansPlusPlus : determina i centroidi iniziali
@@ -43,7 +41,7 @@ func InitCentroidKMeansPlusPlus(points []mapreduce.Points) []mapreduce.Centroids
 }
 
 // Iterazione per la scelta dei centroidi per l'algoritmo kmeans++
-func getCentroids(points []mapreduce.Points, numWorker int, numCentroid int, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call) []mapreduce.Centroids {
+func centroidsKmeansPP(points []mapreduce.Points, numWorker int, numCentroid int, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call) []mapreduce.Centroids {
 	jobMap := util.SplitJobMap(points, numWorker)
 
 	log.Println("Inizio iterazione dei centroidi")

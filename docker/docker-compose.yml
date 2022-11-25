@@ -12,7 +12,7 @@ services:
     networks:
       - mapreduce
     volumes:
-      - ./doc:/doc
+      - /doc:/doc
     profiles:
       - app
       - benchmark
@@ -31,7 +31,7 @@ services:
       - reg_s
       - worker_s
     volumes:
-      - ./doc:/doc
+      - /doc:/doc
     profiles:
       - app
 
@@ -46,7 +46,7 @@ services:
     depends_on:
       - reg_s
     volumes:
-      - ./doc:/doc
+      - /doc:/doc
     profiles:
       - app
       - benchmark
@@ -57,7 +57,7 @@ services:
     hostname: benchmark
     build:
       context: ..
-      dockerfile: Dockerfile_benchmark
+      dockerfile: ./docker/Dockerfile_benchmark
     env_file: ../.env
     networks:
       - mapreduce
@@ -65,7 +65,7 @@ services:
       - reg_s
       - worker_s
     volumes:
-      - ./doc:/doc
+      - /doc:/doc
     profiles:
       - benchmark
 

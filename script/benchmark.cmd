@@ -1,11 +1,5 @@
 cd ../docker
 
-CHOICE /C yn /M "Benchmark after execution main [y] - Benchmark with no execution main[n]"
-set BENCHMARK=%errorlevel%
-
-if %BENCHMARK% == 2 goto :cond
-goto :skip
-:cond
    Rem NUMWORKER
    set /p NUMWORKER=""
 
@@ -29,10 +23,12 @@ goto :skip
    echo NUMWORKER=%NUMWORKER%
    echo NUMCLUSTER=%NUMCLUSTER%
    )> ../.env
-:skip
+
 
 echo "NUMWORKER="%NUMWORKER%
 Rem Docker
 docker-compose --profile benchmark build
 timeout 10
 docker-compose --profile app up benchmark_s --scale worker_s=%NUMWORKER%
+docker container start master
+docker cp master:/doc ./

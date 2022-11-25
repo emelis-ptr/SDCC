@@ -29,7 +29,7 @@ func InitCentroidStandard(points []mapreduce.Points, numCentroid int) []mapreduc
 }
 
 // StandardKMeans : esegue lo stesso procedimento dell'algoritmo Llyod
-func StandardKMeans(numWorker int, numMapper int, numReducer int, points []mapreduce.Points, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call, testing bool) {
+func StandardKMeans(numWorker int, numMapper int, numReducer int, points []mapreduce.Points, centroids []mapreduce.Centroids, clients []*rpc.Client, calls []*rpc.Call, testing bool, algo string) {
 	//Iterazione uguale all'algoritmo di Llyod
-	Llyod(numWorker, numMapper, numReducer, points, centroids, clients, calls, testing)
+	Llyod(numWorker, numMapper, numReducer, points, centroids, clients, calls, testing, algo)
 }
