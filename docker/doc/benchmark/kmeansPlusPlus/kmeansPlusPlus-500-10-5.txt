@@ -1,0 +1,11 @@
+Algoritmo: kmeansPlusPlus
+Punti: 500
+Mapper: 10 - Reducer: 5
+{
+ "N": 1,
+ "T": 546801746900,
+ "Bytes": 0,
+ "MemAllocs": 6110481,
+ "MemBytes": 903594688,
+ "Extra": {}
+}

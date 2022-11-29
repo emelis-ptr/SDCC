@@ -17,7 +17,7 @@ const (
 )
 
 // Plot : rappresenta graficamente i punti e in centroidi di ogni cluster
-func Plot(clusters []mapreduce.Clusters, numMapper int, numReducer int, numPoint int) {
+func Plot(clusters []mapreduce.Clusters, numMapper int, numReducer int, numPoint int, algo string) {
 	p := plot.New()
 
 	p.Title.Text = "KMeans"
@@ -52,7 +52,51 @@ func Plot(clusters []mapreduce.Clusters, numMapper int, numReducer int, numPoint
 	}
 
 	os.Mkdir(DirVolume+"/"+nameDir, os.ModePerm)
-	filename := DirVolume + "/" + nameDir + "/kmeans-" + strconv.Itoa(numPoint) + "-" + strconv.Itoa(numMapper) + "-" + strconv.Itoa(numReducer) + "." + extFile
+	os.Mkdir(DirVolume+"/"+nameDir+"/"+algo, os.ModePerm)
+	filename := DirVolume + "/" + nameDir + "/" + algo + "/" + algo + "-" + strconv.Itoa(numPoint) + "-" + strconv.Itoa(numMapper) + "-" + strconv.Itoa(numReducer) + "." + extFile
+	if err := p.Save(20*vg.Inch, 10*vg.Inch, filename); err != nil {
+		panic(err)
+	}
+}
+
+// PlotWithoutKmeans : rappresenta graficamente i punti e in centroidi di ogni cluster
+func PlotWithoutKmeans(points []mapreduce.Points, centroids []mapreduce.Centroids, numMapper int, numReducer int, numPoint int, algo string) {
+	p := plot.New()
+
+	p.Title.Text = "KMeans"
+	p.X.Label.Text = "X"
+	p.Y.Label.Text = "Y"
+
+	for j := range points {
+		dataPoint := XY(len(points), points[j].Point)
+
+		ss, err := plotter.NewScatter(dataPoint)
+		if err != nil {
+			panic(err)
+		}
+		ss.GlyphStyle.Color = color.Black
+		ss.GlyphStyle.Shape = plotutil.Shape(1)
+		ss.GlyphStyle.Radius = vg.Points(5)
+
+		p.Add(ss)
+	}
+
+	for j := range centroids {
+		dataCluster := XY(len(centroids), centroids[j].Centroid)
+		ss, err := plotter.NewScatter(dataCluster)
+		if err != nil {
+			panic(err)
+		}
+		ss.GlyphStyle.Color = color.RGBA{R: 0, G: 255, B: 0}
+		ss.GlyphStyle.Shape = plotutil.Shape(2)
+		ss.GlyphStyle.Radius = vg.Points(5)
+
+		p.Add(ss)
+	}
+
+	os.Mkdir(DirVolume+"/"+nameDir, os.ModePerm)
+	os.Mkdir(DirVolume+"/"+nameDir+"/"+algo, os.ModePerm)
+	filename := DirVolume + "/" + nameDir + "/" + algo + "/" + algo + "-init-" + strconv.Itoa(numPoint) + "-" + strconv.Itoa(numMapper) + "-" + strconv.Itoa(numReducer) + "." + extFile
 	if err := p.Save(20*vg.Inch, 10*vg.Inch, filename); err != nil {
 		panic(err)
 	}

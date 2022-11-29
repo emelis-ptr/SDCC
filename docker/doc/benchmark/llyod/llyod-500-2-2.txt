@@ -1,0 +1,11 @@
+Algoritmo: llyod
+Punti: 500
+Mapper: 2 - Reducer: 2
+{
+ "N": 1,
+ "T": 84442516200,
+ "Bytes": 0,
+ "MemAllocs": 5954220,
+ "MemBytes": 909237256,
+ "Extra": {}
+}

@@ -50,7 +50,7 @@ if %CHOICE%==2 (
  set ALGO=standardKMeans
 )
 if %CHOICE%==3 (
- set ALGO=kmeansAlgo
+ set ALGO=kmeansPlusPlus
 )
 
 Rem Write file

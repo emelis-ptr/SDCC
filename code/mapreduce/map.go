@@ -15,45 +15,47 @@ func (a *API) Mapper(point []Points, cluster *[]Clusters) error {
 	log.Printf(" ** Map phase **")
 	log.Printf("Numero di punti assegnati %d", len(point))
 
-	lenCentroid := len(point[0].Centroids)
-	clusters := make([]Clusters, lenCentroid)
+	var clusters []Clusters
+	if len(point) != 0 {
+		lenCentroid := len(point[0].Centroids)
+		clusters = make([]Clusters, lenCentroid)
 
-	for _, points := range point {
-		closestCluster := 0
-		var minSquaredDistance float64
+		for _, points := range point {
+			closestCluster := 0
+			var minSquaredDistance float64
 
-		distance := 0.
-		for ii := range points.Point {
-			distance += (points.Point[ii] - points.Centroids[0].Centroid[ii]) * (points.Point[ii] - points.Centroids[0].Centroid[ii])
-		}
-		minSquaredDistance = math.Sqrt(distance)
-
-		for i := 0; i < len(points.Centroids); i++ {
-			distance1 := 0.
+			distance := 0.
 			for ii := range points.Point {
-				distance1 += (points.Point[ii] - points.Centroids[i].Centroid[ii]) * (points.Point[ii] - points.Centroids[i].Centroid[ii])
+				distance += (points.Point[ii] - points.Centroids[0].Centroid[ii]) * (points.Point[ii] - points.Centroids[0].Centroid[ii])
 			}
-			squaredDistance := math.Sqrt(distance1)
-			if squaredDistance < minSquaredDistance {
-				minSquaredDistance = squaredDistance
-				closestCluster = i
-			}
-		}
+			minSquaredDistance = math.Sqrt(distance)
 
-		for i := range clusters {
-			clusters[i].Centroid.Index = i
-			clusters[i].Centroid.Centroid = points.Centroids[i].Centroid
-
-			if i == closestCluster {
-				if closestCluster != points.ClusterNumber.Index {
-					clusters[i].Changes++
+			for i := 0; i < len(points.Centroids); i++ {
+				distance1 := 0.
+				for ii := range points.Point {
+					distance1 += (points.Point[ii] - points.Centroids[i].Centroid[ii]) * (points.Point[ii] - points.Centroids[i].Centroid[ii])
 				}
-				points.ClusterNumber.Index = closestCluster
-				clusters[i].PointsData = append(clusters[i].PointsData, points)
+				squaredDistance := math.Sqrt(distance1)
+				if squaredDistance < minSquaredDistance {
+					minSquaredDistance = squaredDistance
+					closestCluster = i
+				}
+			}
+
+			for i := range clusters {
+				clusters[i].Centroid.Index = i
+				clusters[i].Centroid.Centroid = points.Centroids[i].Centroid
+
+				if i == closestCluster {
+					if closestCluster != points.ClusterNumber.Index {
+						clusters[i].Changes++
+					}
+					points.ClusterNumber.Index = closestCluster
+					clusters[i].PointsData = append(clusters[i].PointsData, points)
+				}
 			}
 		}
 	}
-
 	*cluster = clusters
 	return nil
 }
@@ -69,31 +71,32 @@ func (a *API) MapperKMeans(point []Points, points *[]Points) error {
 	log.Printf("Numero di punti assegnati %d", len(point))
 
 	//Calcola la distanza euclidea del punto per ogni cluster
-	for _, p := range point {
-		var minSquaredDistance float64
+	if len(point) != 0 {
+		for _, p := range point {
+			var minSquaredDistance float64
 
-		distance := 0.
-		for ii := range p.Point {
-			distance += (p.Point[ii] - p.Centroids[0].Centroid[ii]) * (p.Point[ii] - p.Centroids[0].Centroid[ii])
-		}
-		minSquaredDistance = math.Sqrt(distance)
+			distance := 0.
+			for ii := range p.Point {
+				distance += (p.Point[ii] - p.Centroids[0].Centroid[ii]) * (p.Point[ii] - p.Centroids[0].Centroid[ii])
+			}
+			minSquaredDistance = math.Sqrt(distance)
 
-		if len(p.Centroids) != 1 {
-			for i := 0; i < len(p.Centroids); i++ {
-				distance1 := 0.
-				for ii := range p.Point {
-					distance1 += (p.Point[ii] - p.Centroids[i].Centroid[ii]) * (p.Point[ii] - p.Centroids[i].Centroid[ii])
-				}
-				squaredDistance := math.Sqrt(distance1)
-				// determina la distanza più vicina
-				if squaredDistance < minSquaredDistance {
-					minSquaredDistance = squaredDistance
+			if len(p.Centroids) != 1 {
+				for i := 0; i < len(p.Centroids); i++ {
+					distance1 := 0.
+					for ii := range p.Point {
+						distance1 += (p.Point[ii] - p.Centroids[i].Centroid[ii]) * (p.Point[ii] - p.Centroids[i].Centroid[ii])
+					}
+					squaredDistance := math.Sqrt(distance1)
+					// determina la distanza più vicina
+					if squaredDistance < minSquaredDistance {
+						minSquaredDistance = squaredDistance
+					}
 				}
 			}
+			p.Distance = minSquaredDistance
 		}
-		p.Distance = minSquaredDistance
 	}
-
 	*points = point
 	return nil
 }

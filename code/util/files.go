@@ -30,7 +30,8 @@ func WriteClusters(clusters []mapreduce.Clusters, numPoint int, numMapper int, n
 	fileName := algo + "-" + strconv.Itoa(numPoint) + "-" + strconv.Itoa(numMapper) + "-" + strconv.Itoa(numReducer) + ".txt"
 
 	os.Mkdir(DirVolume+"/clusters", os.ModePerm)
-	f, err := os.Create("/" + DirVolume + "/clusters/" + fileName)
+	os.Mkdir(DirVolume+"/clusters/"+algo, os.ModePerm)
+	f, err := os.Create("/" + DirVolume + "/clusters/" + algo + "/" + fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,7 +44,7 @@ func WriteClusters(clusters []mapreduce.Clusters, numPoint int, numMapper int, n
 	if err != nil {
 		log.Fatal("Errore scrittura file clusters", err)
 	}
-	fmt.Println("done")
+	fmt.Println("Scrittura clusters completata!")
 }
 
 // WriteBenchmark : scrive le informazioni del benchmark su un file txt
@@ -51,7 +52,8 @@ func WriteBenchmark(res testing.BenchmarkResult, numPoint int, numMapper int, nu
 	fileName := algo + "-" + strconv.Itoa(numPoint) + "-" + strconv.Itoa(numMapper) + "-" + strconv.Itoa(numReducer) + ".txt"
 
 	os.Mkdir(DirVolume+"/benchmark", os.ModePerm)
-	f, err := os.Create("/" + DirVolume + "/benchmark/" + fileName)
+	os.Mkdir(DirVolume+"/benchmark/"+algo, os.ModePerm)
+	f, err := os.Create("/" + DirVolume + "/benchmark/" + algo + "/" + fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,13 +62,12 @@ func WriteBenchmark(res testing.BenchmarkResult, numPoint int, numMapper int, nu
 
 	file, _ := json.MarshalIndent(res, "", " ")
 
-	_, err = f.WriteString(" ************************* ")
-	_, err = f.WriteString("Algoritmo: " + algo)
-	_, err = f.WriteString(" - Punti: " + strconv.Itoa(numPoint))
-	_, err = f.WriteString("Mapper: " + strconv.Itoa(numMapper) + " - Reducer: " + strconv.Itoa(numReducer))
+	_, err = f.WriteString("Algoritmo: " + algo + "\n")
+	_, err = f.WriteString("Punti: " + strconv.Itoa(numPoint) + "\n")
+	_, err = f.WriteString("Mapper: " + strconv.Itoa(numMapper) + " - Reducer: " + strconv.Itoa(numReducer) + "\n")
 	_, err = f.Write(file)
 	if err != nil {
 		log.Fatal("Errore scrittura file benchmark", err)
 	}
-	fmt.Println("done")
+	fmt.Println("Scrittura benchmark completata")
 }

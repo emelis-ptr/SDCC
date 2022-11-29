@@ -1,0 +1,11 @@
+Algoritmo: standardKMeans
+Punti: 800
+Mapper: 10 - Reducer: 10
+{
+ "N": 1,
+ "T": 341690574800,
+ "Bytes": 0,
+ "MemAllocs": 14772238,
+ "MemBytes": 2144438184,
+ "Extra": {}
+}

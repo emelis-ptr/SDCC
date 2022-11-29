@@ -39,7 +39,7 @@ case $algos in
   ALGO=standardKMeans
   ;;
 3) echo "kmeans++"
-  ALGO=kmeansAlgo
+  ALGO=kmeansPlusPlus
   ;;
 esac
 

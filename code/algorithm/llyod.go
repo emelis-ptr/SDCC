@@ -52,6 +52,8 @@ func Llyod(numWorker int, numMapper int, numReducer int, points []mapreduce.Poin
 	log.Printf("Punti: %d - Centroidi: %d", len(points), len(centroids))
 	log.Printf("Mapper: %d - Reducer: %d", numMapper, numReducer)
 
+	util.PlotWithoutKmeans(points, centroids, numMapper, numReducer, len(points), algo)
+
 	jobMap := util.SplitJobMap(points, numWorker)
 	var changes []int
 	var isChanged bool
@@ -84,7 +86,7 @@ func Llyod(numWorker int, numMapper int, numReducer int, points []mapreduce.Poin
 		changes, isChanged = util.CheckChanges(clusters, changes)
 		if isChanged {
 			log.Println("Numero di iterazioni totali: ", it)
-			util.Plot(clusters, numMapper, numReducer, len(points))
+			util.Plot(clusters, numMapper, numReducer, len(points), algo)
 			util.WriteClusters(clusters, len(points), numMapper, numReducer, algo)
 			break
 		}

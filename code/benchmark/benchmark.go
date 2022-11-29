@@ -5,6 +5,8 @@ import (
 	"SDCC-project/code/util"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"testing"
 )
 
@@ -12,32 +14,46 @@ import (
 Benchmark
 */
 
+var numWorker int
+var numCentroid int
 var numPoint int
 var numMapper int
 var numReducer int
 var algo string
 
+var regIP string
+var regPort int
+var masterPort int
+
 func main() {
-	for _, a := range util.Algos {
-		algo = a.Input
-		log.Printf("Algorithm: %s", a.Input)
-		for _, p := range util.Points {
-			numPoint = p.Input
-			for _, m := range util.Mappers {
-				numMapper = m.Input
-				for _, r := range util.Reducers {
-					numReducer = r.Input
-					Benchmark()
-				}
-			}
-		}
-	}
+	var conf util.Conf
+	conf.ReadConf(util.ConfPath)
+
+	util.OpenEnv()
+	numWorker, _ = strconv.Atoi(os.Getenv(util.NumWorker))
+	numCentroid, _ = strconv.Atoi(os.Getenv(util.NumCluster))
+	algo = os.Getenv(util.Algo)
+
+	regIP = conf.RegIP
+	regPort = conf.RegPort
+	masterPort = conf.MasterPort
+
+	res := testing.Benchmark(BenchmarkMaster20022)
+	result(res)
+	res = testing.Benchmark(BenchmarkMaster20052)
+	result(res)
+	res = testing.Benchmark(BenchmarkMaster50052)
+	result(res)
+	res = testing.Benchmark(BenchmarkMaster500105)
+	result(res)
+	res = testing.Benchmark(BenchmarkMaster8001010)
+	result(res)
 }
 
-// Benchmark : esegue la funzione di benchmark
-func Benchmark() {
-	res := testing.Benchmark(BenchmarkMaster)
+// result
+func result(res testing.BenchmarkResult) {
 	log.Println(" ************** ")
+	log.Printf("Algorithm: %s", algo)
 	log.Printf("Point: %d - Mapper: %d - Reducer: %d", numPoint, numMapper, numReducer)
 	fmt.Printf("Memory allocations : %d \n", res.MemAllocs)
 	fmt.Printf("Number of bytes processed in one iteration: %d \n", res.Bytes)
@@ -49,14 +65,17 @@ func Benchmark() {
 }
 
 // BenchmarkMaster : benchmark
-func BenchmarkMaster(b *testing.B) {
-	numCentroid := 5
-	numWorker := 3
-	regIP := "registry"
-	regPort := 8000
-	masterPort := 9000
-
+func benchmarkMaster(nPoint int, nMapper int, nReducer int, b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		master.Master(numWorker, numPoint, numCentroid, numMapper, numReducer, algo, regIP, regPort, masterPort, true)
+		master.Master(numWorker, nPoint, numCentroid, nMapper, nReducer, algo, regIP, regPort, masterPort, true)
 	}
+	numPoint = nPoint
+	numMapper = nMapper
+	numReducer = nReducer
 }
+
+func BenchmarkMaster20022(b *testing.B)   { benchmarkMaster(200, 2, 2, b) }
+func BenchmarkMaster20052(b *testing.B)   { benchmarkMaster(200, 5, 2, b) }
+func BenchmarkMaster50052(b *testing.B)   { benchmarkMaster(500, 5, 2, b) }
+func BenchmarkMaster500105(b *testing.B)  { benchmarkMaster(500, 10, 5, b) }
+func BenchmarkMaster8001010(b *testing.B) { benchmarkMaster(800, 10, 10, b) }
