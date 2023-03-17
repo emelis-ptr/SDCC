@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/joho/godotenv v1.4.0
 	golang.org/x/sync v0.1.0
+	gonum.org/v1/plot v0.12.0
 )
 
 require (
@@ -15,6 +16,5 @@ require (
 	github.com/go-pdf/fpdf v0.6.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	golang.org/x/image v0.0.0-20220902085622-e7cb96979f69 // indirect
-	golang.org/x/text v0.3.7 // indirect
-	gonum.org/v1/plot v0.12.0 // indirect
+	golang.org/x/text v0.3.8 // indirect
 )
